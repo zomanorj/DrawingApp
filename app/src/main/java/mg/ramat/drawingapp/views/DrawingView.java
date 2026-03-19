@@ -8,12 +8,19 @@ import android.view.View;
 import android.view.MotionEvent;
 import java.util.ArrayList;
 import java.util.List;
+import mg.ramat.drawingapp.data.Figure;
+import mg.ramat.drawingapp.data.Line;
+import mg.ramat.drawingapp.data.Rectangle;
+import mg.ramat.drawingapp.data.Oval;
 
 public class DrawingView extends View {
 
     private  Paint paint;
     private  float startX, startY, endX, endY;
-    private List<float[]> lines = new ArrayList<>();
+    private List<Figure> figures = new ArrayList<>();
+    private Figure currentFigure = null;
+    private int figureType = 2;
+
 
     public DrawingView(Context context) {
         super(context);
@@ -32,13 +39,10 @@ public class DrawingView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         super.onDraw(canvas);
-        // Dessiner les anciennes lignes
-        for (float[] line : lines) {
-            canvas.drawLine(line[0], line[1], line[2], line[3], paint);
-        }
 
-        // Dessiner la ligne actuelle
-        canvas.drawLine(startX, startY, endX, endY, paint);
+        for (Figure f : figures) {
+            f.draw(canvas);
+        }
     }
 
     @Override
@@ -50,19 +54,28 @@ public class DrawingView extends View {
         switch (event.getAction()) {
 
             case MotionEvent.ACTION_DOWN:
-                startX = x;
-                startY = y;
+
+                if (figureType == 1) {
+                    currentFigure = new Line(x, y, x, y, new Paint(paint));
+                } else if (figureType == 2) {
+                    currentFigure = new Rectangle(x, y, x, y, new Paint(paint));
+                } else {
+                    currentFigure = new Oval(x, y, x, y, new Paint(paint));
+                }
+
+                figures.add(currentFigure);
                 break;
 
             case MotionEvent.ACTION_MOVE:
-                endX = x;
-                endY = y;
-                invalidate();
+
+                if (currentFigure != null) {
+                    currentFigure.setEnd(x, y);
+                    invalidate();
+                }
                 break;
 
             case MotionEvent.ACTION_UP:
-                // On sauvegarde la ligne
-                lines.add(new float[]{startX, startY, endX, endY});
+                currentFigure = null;
                 break;
         }
 
