@@ -1,9 +1,49 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
+    <!-- Thème principal Drawing Whiteboard - Sprint 2 -->
     <style name="Base.Theme.DrawingApp" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <!-- Palette de couleurs principale -->
+        <item name="colorPrimary">@color/purple_primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/purple_light</item>
+        <item name="colorOnPrimaryContainer">@color/purple_dark</item>
+        
+        <!-- Couleurs secondaires -->
+        <item name="colorSecondary">@color/purple_secondary</item>
+        <item name="colorOnSecondary">@color/white</item>
+        
+        <!-- Surface et fond -->
+        <item name="colorSurface">@color/white</item>
+        <item name="colorOnSurface">@color/black</item>
+        <item name="android:colorBackground">@color/background_light</item>
+        <item name="colorOnBackground">@color/black</item>
     </style>
 
     <style name="Theme.DrawingApp" parent="Base.Theme.DrawingApp" />
+    
+    <!-- Style pour boutons d'outils (formes, options) -->
+    <style name="Widget.DrawingApp.ToolButton" parent="Widget.Material3.Button">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">@dimen/button_height</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:layout_margin">@dimen/margin_tiny</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">@dimen/corner_radius_medium</item>
+        <item name="backgroundTint">@color/purple_primary</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+    
+    <!-- Style pour carrés de couleur (sans texte) -->
+    <style name="Widget.DrawingApp.ColorSquare" parent="Widget.Material3.Button">
+        <item name="android:layout_width">32dp</item>
+        <item name="android:layout_height">32dp</item>
+        <item name="android:layout_margin">@dimen/margin_tiny</item>
+        <item name="android:textAllCaps">false</item>
+        <item name="cornerRadius">@dimen/corner_radius_small</item>
+        <item name="android:textColor">@android:color/transparent</item>
+        <item name="android:text">@null</item>
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:padding">0dp</item>
+    </style>
 </resources>

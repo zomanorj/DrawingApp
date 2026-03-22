@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Système de dimensions - Drawing Whiteboard Sprint 2 -->
+    
+    <!-- Espacements (padding/margin) -->
+    <dimen name="padding_tiny">4dp</dimen>
+    <dimen name="padding_small">8dp</dimen>
+    <dimen name="padding_medium">16dp</dimen>
+    <dimen name="padding_large">24dp</dimen>
+    
+    <dimen name="margin_tiny">4dp</dimen>
+    <dimen name="margin_small">8dp</dimen>
+    <dimen name="margin_medium">16dp</dimen>
+    <dimen name="margin_large">24dp</dimen>
+    
+    <!-- Dimensions des composants -->
+    <dimen name="button_height">48dp</dimen>
+    <dimen name="toolbar_height">56dp</dimen>
+    <dimen name="corner_radius_small">8dp</dimen>
+    <dimen name="corner_radius_medium">16dp</dimen>
+    <dimen name="corner_radius_large">24dp</dimen>
+    
+    <!-- Tailles de texte -->
+    <dimen name="text_small">12sp</dimen>
+    <dimen name="text_medium">14sp</dimen>
+    <dimen name="text_large">16sp</dimen>
+    
+    <!-- Épaisseurs de trait pour dessin -->
+    <dimen name="stroke_thin">2dp</dimen>
+    <dimen name="stroke_normal">4dp</dimen>
+    <dimen name="stroke_thick">8dp</dimen>
+    <dimen name="stroke_extra_thick">12dp</dimen>
+</resources>

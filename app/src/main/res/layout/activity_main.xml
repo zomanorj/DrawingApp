@@ -1,58 +1,236 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    Drawing Whiteboard - Écran Principal
+    Projet Android - Méthode Agile Sprint 3
+    Auteur: Équipe DrawingApp
+    Version: 3.0 - Outils séparés par catégorie
+-->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/background_light">
 
-    <!-- 🎛️ BARRE DE CONTROLES -->
+    <!-- 📐 BARRE D'OUTILS DE FORMES -->
+    <!-- Ligne, Rectangle, Ellipse -->
     <LinearLayout
+        android:id="@+id/shapesToolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="@dimen/padding_small"
+        android:layout_marginTop="@dimen/margin_medium"
+        android:layout_marginHorizontal="@dimen/margin_medium"
+        android:background="@drawable/toolbar_background"
+        android:elevation="4dp">
 
         <Button
             android:id="@+id/btnLine"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ligne" />
+            style="@style/Widget.DrawingApp.ToolButton"
+            android:text="@string/line_tool"
+            android:contentDescription="@string/draw_line_description" />
 
         <Button
             android:id="@+id/btnRect"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rectangle"/>
+            style="@style/Widget.DrawingApp.ToolButton"
+            android:text="@string/rectangle_tool"
+            android:contentDescription="@string/draw_rectangle_description" />
 
         <Button
             android:id="@+id/btnOval"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Ellipse"/>
+            style="@style/Widget.DrawingApp.ToolButton"
+            android:text="@string/ellipse_tool"
+            android:contentDescription="@string/draw_ellipse_description" />
 
-        <Button
-            android:id="@+id/btnRed"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Rouge"/>
-
-        <Button
-            android:id="@+id/btnBlue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Bleu"/>
-
-        <Button
-            android:id="@+id/btnThick"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Épais"/>
     </LinearLayout>
 
-    <!-- 🧱 ZONE DE DESSIN -->
+    <!-- 🎨 BARRE DE SÉLECTION DE COULEURS -->
+    <!-- Palette de couleurs avec défilement horizontal -->
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginHorizontal="@dimen/margin_medium"
+        android:scrollbars="horizontal">
+
+        <LinearLayout
+            android:id="@+id/colorsToolbar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:padding="@dimen/padding_small"
+            android:background="@drawable/toolbar_background"
+            android:elevation="4dp">
+
+            <!-- Boutons carrés de couleur sans texte -->
+            <Button
+                android:id="@+id/btnRed"
+                style="@style/Widget.DrawingApp.ColorSquare"
+                android:backgroundTint="@color/drawing_red"
+                android:contentDescription="@string/select_red_color" />
+
+            <Button
+                android:id="@+id/btnBlue"
+                style="@style/Widget.DrawingApp.ColorSquare"
+                android:backgroundTint="@color/drawing_blue"
+                android:contentDescription="@string/select_blue_color" />
+
+            <Button
+                android:id="@+id/btnGreen"
+                style="@style/Widget.DrawingApp.ColorSquare"
+                android:backgroundTint="@color/drawing_green"
+                android:contentDescription="@string/select_green_color" />
+
+            <Button
+                android:id="@+id/btnBlack"
+                style="@style/Widget.DrawingApp.ColorSquare"
+                android:backgroundTint="@color/drawing_black"
+                android:contentDescription="@string/select_black_color" />
+
+            <Button
+                android:id="@+id/btnYellow"
+                style="@style/Widget.DrawingApp.ColorSquare"
+                android:backgroundTint="@color/drawing_yellow"
+                android:contentDescription="@string/select_yellow_color" />
+
+            <Button
+                android:id="@+id/btnOrange"
+                style="@style/Widget.DrawingApp.ColorSquare"
+                android:backgroundTint="@color/drawing_orange"
+                android:contentDescription="@string/select_orange_color" />
+
+            <Button
+                android:id="@+id/btnPurple"
+                style="@style/Widget.DrawingApp.ColorSquare"
+                android:backgroundTint="@color/drawing_purple"
+                android:contentDescription="@string/select_purple_color" />
+
+            <Button
+                android:id="@+id/btnPink"
+                style="@style/Widget.DrawingApp.ColorSquare"
+                android:backgroundTint="@color/drawing_pink"
+                android:contentDescription="@string/select_pink_color" />
+
+            <Button
+                android:id="@+id/btnCyan"
+                style="@style/Widget.DrawingApp.ColorSquare"
+                android:backgroundTint="@color/drawing_cyan"
+                android:contentDescription="@string/select_cyan_color" />
+
+            <Button
+                android:id="@+id/btnLime"
+                style="@style/Widget.DrawingApp.ColorSquare"
+                android:backgroundTint="@color/drawing_lime"
+                android:contentDescription="@string/select_lime_color" />
+
+        </LinearLayout>
+
+    </HorizontalScrollView>
+
+    <!-- ↩️ BARRE D'ACTIONS -->
+    <!-- Annuler et autres actions -->
+    <LinearLayout
+        android:id="@+id/actionsToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center"
+        android:padding="@dimen/padding_small"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginHorizontal="@dimen/margin_medium"
+        android:background="@drawable/toolbar_background"
+        android:elevation="4dp">
+
+        <!-- Bouton Annuler -->
+        <Button
+            android:id="@+id/btnUndo"
+            style="@style/Widget.DrawingApp.ToolButton"
+            android:text="@string/undo_action"
+            android:contentDescription="@string/undo_description" />
+
+        <!-- Espace pour futures actions -->
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <!-- Bouton Effacer tout (pour plus tard) -->
+        <Button
+            android:id="@+id/btnClear"
+            style="@style/Widget.DrawingApp.ToolButton"
+            android:text="@string/clear_action"
+            android:backgroundTint="@color/drawing_red"
+            android:contentDescription="@string/clear_description"
+            android:visibility="gone" />
+
+    </LinearLayout>
+
+    <!-- ✏️ BARRE D'OPTIONS DE TRAIT -->
+    <!-- Épaisseur avec SeekBar pour ajustement précis -->
+    <LinearLayout
+        android:id="@+id/strokeToolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:padding="@dimen/padding_small"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginHorizontal="@dimen/margin_medium"
+        android:background="@drawable/toolbar_background"
+        android:elevation="4dp">
+
+        <!-- Label et valeur -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center"
+            android:layout_marginBottom="@dimen/margin_tiny">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Épaisseur du trait : "
+                android:textSize="@dimen/text_medium"
+                android:textColor="@color/black"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvStrokeValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="8dp"
+                android:textSize="@dimen/text_medium"
+                android:textColor="@color/purple_primary"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+
+        <!-- SeekBar pour ajuster l'épaisseur -->
+        <SeekBar
+            android:id="@+id/seekBarStroke"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:max="20"
+            android:progress="8"
+            android:progressTint="@color/purple_primary"
+            android:thumbTint="@color/purple_secondary"
+            android:contentDescription="Barre de défilement pour l'épaisseur du trait" />
+
+    </LinearLayout>
+
+    <!-- 🖼️ ZONE DE DESSIN -->
+    <!-- Espace principal pour créer les dessins -->
     <mg.ramat.drawingapp.views.DrawingView
         android:id="@+id/drawingView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"/>
+        android:layout_weight="1"
+        android:layout_margin="@dimen/margin_medium"
+        android:background="@color/canvas_background"
+        android:contentDescription="@string/drawing_canvas_description" />
 
 </LinearLayout>

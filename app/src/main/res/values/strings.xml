@@ -1,3 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- App information -->
     <string name="app_name">DrawingApp</string>
+    
+    <!-- 📐 Outils de formes -->
+    <string name="line_tool">Ligne</string>
+    <string name="rectangle_tool">Rectangle</string>
+    <string name="ellipse_tool">Ellipse</string>
+    
+    <!-- 🎨 Couleurs -->
+    <string name="select_red_color">Couleur rouge</string>
+    <string name="select_blue_color">Couleur bleue</string>
+    <string name="select_green_color">Couleur verte</string>
+    <string name="select_black_color">Couleur noire</string>
+    <string name="select_yellow_color">Couleur jaune</string>
+    <string name="select_orange_color">Couleur orange</string>
+    <string name="select_purple_color">Couleur violette</string>
+    <string name="select_pink_color">Couleur rose</string>
+    <string name="select_cyan_color">Couleur cyan</string>
+    <string name="select_lime_color">Couleur vert clair</string>
+    
+    <!-- ↩️ Actions -->
+    <string name="undo_action">Annuler</string>
+    <string name="clear_action">Effacer</string>
+    <string name="undo_description">Annuler la dernière action</string>
+    <string name="clear_description">Effacer tout le dessin</string>
+    
+    <!-- ✏️ Épaisseurs de trait -->
+    <string name="thin_stroke">Fin</string>
+    <string name="normal_stroke">Normal</string>
+    <string name="thick_stroke">Épais</string>
+    <string name="extra_thick_stroke">Très Épais</string>
+    
+    <!-- 📝 Descriptions d'accessibilité -->
+    <string name="draw_line_description">Dessiner une ligne</string>
+    <string name="draw_rectangle_description">Dessiner un rectangle</string>
+    <string name="draw_ellipse_description">Dessiner une ellipse</string>
+    <string name="thin_stroke_description">Trait fin</string>
+    <string name="normal_stroke_description">Trait normal</string>
+    <string name="thick_stroke_description">Trait épais</string>
+    <string name="extra_thick_stroke_description">Trait très épais</string>
+    <string name="drawing_canvas_description">Zone de dessin</string>
 </resources>
