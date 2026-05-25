@@ -1,7 +1,38 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Base application theme. -->
-    <style name="Base.Theme.DrawingApp" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Customize your dark theme here. -->
-        <!-- <item name="colorPrimary">@color/my_dark_primary</item> -->
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        Base.Theme.DrawingApp — dark
+        Surcharge uniquement le parent (Dark) et les rôles de couleur MD3.
+        Les styles de widgets restent ceux de values/themes.xml ; leurs
+        références @color/* sont résolues automatiquement via le qualificateur -night.
+    -->
+    <style name="Base.Theme.DrawingApp" parent="Theme.Material3.Dark.NoActionBar">
+
+        <!-- ── Rôles MD3 — dark ───────────────────────────────────────────── -->
+        <item name="colorPrimary">@color/brand_primary</item>
+        <!-- colorOnPrimary dark = #381E72 (violet profond sur lavande) -->
+        <item name="colorOnPrimary">#381E72</item>
+        <item name="colorPrimaryContainer">@color/brand_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/ink_strong</item>
+        <item name="colorSecondary">@color/brand_secondary</item>
+        <!-- colorOnSecondary dark = #332D41 -->
+        <item name="colorOnSecondary">#332D41</item>
+        <item name="colorSecondaryContainer">@color/brand_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/ink_strong</item>
+        <item name="colorTertiary">@color/brand_accent</item>
+        <!-- colorOnTertiary dark = #492532 -->
+        <item name="colorOnTertiary">#492532</item>
+        <item name="colorSurface">@color/surface_panel</item>
+        <item name="colorSurfaceVariant">@color/surface_soft</item>
+        <item name="colorOnSurface">@color/ink_strong</item>
+        <item name="colorOnSurfaceVariant">@color/ink_soft</item>
+        <item name="colorOutline">@color/stroke_outline</item>
+        <item name="colorOutlineVariant">@color/stroke_soft</item>
+        <item name="android:colorBackground">@color/screen_background</item>
+        <item name="colorOnBackground">@color/ink_strong</item>
+        <item name="android:navigationBarColor">@color/screen_background</item>
+        <item name="android:statusBarColor">@color/screen_background</item>
     </style>
+
 </resources>

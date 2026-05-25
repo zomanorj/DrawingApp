@@ -1,49 +1,158 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
-    <!-- Thème principal Drawing Whiteboard - Sprint 2 -->
-    <style name="Base.Theme.DrawingApp" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Palette de couleurs principale -->
-        <item name="colorPrimary">@color/purple_primary</item>
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!--
+        Base.Theme.DrawingApp — light
+        Parent : Theme.Material3.Light.NoActionBar
+        Contient les rôles de couleur MD3 (light) + tous les styles de widgets.
+        values-night/themes.xml surcharge uniquement le parent + les rôles couleur.
+    -->
+    <style name="Base.Theme.DrawingApp" parent="Theme.Material3.Light.NoActionBar">
+
+        <!-- ── Rôles MD3 — light ──────────────────────────────────────────── -->
+        <item name="colorPrimary">@color/brand_primary</item>
         <item name="colorOnPrimary">@color/white</item>
-        <item name="colorPrimaryContainer">@color/purple_light</item>
-        <item name="colorOnPrimaryContainer">@color/purple_dark</item>
-        
-        <!-- Couleurs secondaires -->
-        <item name="colorSecondary">@color/purple_secondary</item>
+        <item name="colorPrimaryContainer">@color/brand_primary_container</item>
+        <item name="colorOnPrimaryContainer">@color/ink_strong</item>
+        <item name="colorSecondary">@color/brand_secondary</item>
         <item name="colorOnSecondary">@color/white</item>
-        
-        <!-- Surface et fond -->
-        <item name="colorSurface">@color/white</item>
-        <item name="colorOnSurface">@color/black</item>
-        <item name="android:colorBackground">@color/background_light</item>
-        <item name="colorOnBackground">@color/black</item>
+        <item name="colorSecondaryContainer">@color/brand_secondary_container</item>
+        <item name="colorOnSecondaryContainer">@color/ink_strong</item>
+        <item name="colorTertiary">@color/brand_accent</item>
+        <item name="colorOnTertiary">@color/white</item>
+        <item name="colorSurface">@color/surface_panel</item>
+        <item name="colorSurfaceVariant">@color/surface_soft</item>
+        <item name="colorOnSurface">@color/ink_strong</item>
+        <item name="colorOnSurfaceVariant">@color/ink_soft</item>
+        <item name="colorOutline">@color/stroke_outline</item>
+        <item name="colorOutlineVariant">@color/stroke_soft</item>
+        <item name="android:colorBackground">@color/screen_background</item>
+        <item name="colorOnBackground">@color/ink_strong</item>
+        <item name="android:navigationBarColor">@color/screen_background</item>
+        <item name="android:statusBarColor">@color/screen_background</item>
     </style>
 
     <style name="Theme.DrawingApp" parent="Base.Theme.DrawingApp" />
-    
-    <!-- Style pour boutons d'outils (formes, options) -->
-    <style name="Widget.DrawingApp.ToolButton" parent="Widget.Material3.Button">
-        <item name="android:layout_width">0dp</item>
-        <item name="android:layout_height">@dimen/button_height</item>
-        <item name="android:layout_weight">1</item>
-        <item name="android:layout_margin">@dimen/margin_tiny</item>
-        <item name="android:textSize">@dimen/text_small</item>
-        <item name="android:textAllCaps">false</item>
-        <item name="cornerRadius">@dimen/corner_radius_medium</item>
-        <item name="backgroundTint">@color/purple_primary</item>
-        <item name="android:textColor">@color/white</item>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         TOOLBAR
+         ═══════════════════════════════════════════════════════════════════════ -->
+
+    <style name="Widget.DrawingApp.Toolbar" parent="Widget.Material3.Toolbar">
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:minHeight">@dimen/toolbar_height</item>
+        <item name="titleTextColor">@color/ink_strong</item>
+        <item name="subtitleTextColor">@color/ink_soft</item>
     </style>
-    
-    <!-- Style pour carrés de couleur (sans texte) -->
-    <style name="Widget.DrawingApp.ColorSquare" parent="Widget.Material3.Button">
-        <item name="android:layout_width">32dp</item>
-        <item name="android:layout_height">32dp</item>
-        <item name="android:layout_margin">@dimen/margin_tiny</item>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         CARDS
+         ═══════════════════════════════════════════════════════════════════════ -->
+
+    <style name="Widget.DrawingApp.SectionCard" parent="Widget.Material3.CardView.Outlined">
+        <item name="cardBackgroundColor">@color/surface_panel</item>
+        <item name="cardCornerRadius">@dimen/corner_radius_medium</item>
+        <item name="cardElevation">0dp</item>
+        <item name="strokeColor">@color/stroke_soft</item>
+        <item name="strokeWidth">@dimen/outline_width_regular</item>
+    </style>
+
+    <style name="Widget.DrawingApp.HeroCard" parent="Widget.DrawingApp.SectionCard">
+        <item name="cardBackgroundColor">@color/hero_card_background</item>
+        <item name="strokeColor">@color/brand_primary_container</item>
+    </style>
+
+    <style name="Widget.DrawingApp.CanvasCard" parent="Widget.DrawingApp.SectionCard">
+        <item name="cardBackgroundColor">@color/canvas_background</item>
+    </style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         BUTTONS — base commun
+         ═══════════════════════════════════════════════════════════════════════ -->
+
+    <style name="Widget.DrawingApp.BaseButton" parent="Widget.Material3.Button">
+        <item name="android:layout_height">@dimen/button_height</item>
+        <item name="android:minWidth">0dp</item>
         <item name="android:textAllCaps">false</item>
-        <item name="cornerRadius">@dimen/corner_radius_small</item>
-        <item name="android:textColor">@android:color/transparent</item>
-        <item name="android:text">@null</item>
+        <item name="android:textSize">@dimen/text_small</item>
+        <item name="cornerRadius">@dimen/corner_radius_medium</item>
+        <item name="iconPadding">0dp</item>
+    </style>
+
+    <!-- Bouton de sélection de mode / forme -->
+    <style name="Widget.DrawingApp.ToggleButton" parent="Widget.DrawingApp.BaseButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:paddingHorizontal">@dimen/padding_medium</item>
+        <item name="android:textColor">@color/ink_strong</item>
+        <item name="backgroundTint">@color/surface_soft</item>
+    </style>
+
+    <!-- Bouton secondaire inline (BottomSheet, actions contextuelles) -->
+    <style name="Widget.DrawingApp.InlineButton.Secondary" parent="Widget.DrawingApp.BaseButton">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:paddingHorizontal">@dimen/padding_medium</item>
+        <item name="android:textColor">@color/ink_strong</item>
+        <item name="backgroundTint">@color/surface_soft</item>
+        <item name="strokeColor">@color/stroke_soft</item>
+        <item name="strokeWidth">@dimen/outline_width_regular</item>
+    </style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         GRILLE D'ACTIONS
+         ═══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- Base : occupe 1 part de poids dans une rangée horizontale -->
+    <style name="Widget.DrawingApp.ActionGridButton" parent="Widget.DrawingApp.BaseButton">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_margin">@dimen/margin_tiny</item>
+        <item name="android:layout_weight">1</item>
+    </style>
+
+    <!-- Secondaire : fond neutre + bordure subtile -->
+    <style name="Widget.DrawingApp.ActionGridButton.Secondary" parent="Widget.DrawingApp.ActionGridButton">
+        <item name="android:textColor">@color/ink_strong</item>
+        <item name="backgroundTint">@color/surface_soft</item>
+        <item name="strokeColor">@color/stroke_soft</item>
+        <item name="strokeWidth">@dimen/outline_width_regular</item>
+    </style>
+
+    <!-- Primaire : fond colorPrimary, texte colorOnPrimary (résolu par le thème) -->
+    <style name="Widget.DrawingApp.ActionGridButton.Primary" parent="Widget.DrawingApp.ActionGridButton">
+        <item name="android:textColor">?attr/colorOnPrimary</item>
+        <item name="backgroundTint">?attr/colorPrimary</item>
+    </style>
+
+    <!-- Destructif : fond colorError, texte colorOnError (résolu par le thème) -->
+    <style name="Widget.DrawingApp.ActionGridButton.Destructive" parent="Widget.DrawingApp.ActionGridButton">
+        <item name="android:textColor">?attr/colorOnError</item>
+        <item name="backgroundTint">?attr/colorError</item>
+    </style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         PALETTE DE COULEURS
+         ═══════════════════════════════════════════════════════════════════════ -->
+
+    <!-- Pastille ronde de couleur -->
+    <style name="Widget.DrawingApp.PaletteSwatch" parent="Widget.Material3.Button">
         <item name="android:minWidth">0dp</item>
         <item name="android:minHeight">0dp</item>
         <item name="android:padding">0dp</item>
+        <item name="android:text">@null</item>
+        <item name="cornerRadius">@dimen/corner_radius_large</item>
+        <item name="strokeColor">@color/stroke_soft</item>
+        <item name="strokeWidth">@dimen/outline_width_regular</item>
     </style>
+
+    <!-- ═══════════════════════════════════════════════════════════════════════
+         STATUS CHIP
+         ═══════════════════════════════════════════════════════════════════════ -->
+
+    <style name="Widget.DrawingApp.StatusChip" parent="Widget.MaterialComponents.Chip.Action">
+        <item name="chipBackgroundColor">@color/surface_panel</item>
+        <item name="chipStrokeColor">@color/stroke_soft</item>
+        <item name="chipStrokeWidth">@dimen/outline_width_regular</item>
+        <item name="android:textColor">@color/ink_strong</item>
+        <item name="android:textSize">@dimen/text_small</item>
+    </style>
+
 </resources>
