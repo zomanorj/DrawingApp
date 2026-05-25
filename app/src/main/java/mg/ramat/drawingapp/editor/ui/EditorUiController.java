@@ -186,7 +186,8 @@ public final class EditorUiController implements CanvasStateListener {
         });
 
         binding.btnClear.setOnClickListener(v -> {
-            if (binding.drawingView.hasFigures()) {
+            // hasContent() inclut les tracés de gomme, contrairement à hasFigures()
+            if (binding.drawingView.hasContent()) {
                 binding.drawingView.clearAll();
                 showMessage(context.getString(R.string.message_canvas_cleared));
             } else {

@@ -572,6 +572,12 @@ public class DrawingView extends View {
         return selectedFigure != null;
     }
 
+    /** @return vrai si la toile a au moins une figure ou un tracé de gomme */
+    public boolean hasContent() {
+        return !figures.isEmpty() || !eraserStrokes.isEmpty();
+    }
+
+    /** @return vrai si la toile a au moins une figure dessinée (hors gomme) */
     public boolean hasFigures() {
         return !figures.isEmpty();
     }
