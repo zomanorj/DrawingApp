@@ -572,6 +572,21 @@ public class DrawingView extends View {
         return selectedFigure != null;
     }
 
+    /**
+     * Retourne le style de la figure sélectionnée, ou {@code null} si aucune.
+     * Utilisé par le BottomSheet d'édition pour pré-remplir les champs.
+     */
+    public FigureStyle getSelectedFigureStyle() {
+        if (selectedFigure == null) {
+            return null;
+        }
+        return new FigureStyle(
+                selectedFigure.getStrokeColor(),
+                selectedFigure.getFillColor(),
+                selectedFigure.getStrokeWidth()
+        );
+    }
+
     /** @return vrai si la toile a au moins une figure ou un tracé de gomme */
     public boolean hasContent() {
         return !figures.isEmpty() || !eraserStrokes.isEmpty();
