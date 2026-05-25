@@ -424,6 +424,14 @@ public final class EditorUiController implements CanvasStateListener {
         Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
     }
 
+    /**
+     * Libère la référence circulaire DrawingView → EditorUiController → binding → Activity.
+     * À appeler depuis Activity.onDestroy() pour permettre au GC de collecter l'Activity.
+     */
+    public void detach() {
+        binding.drawingView.removeCanvasStateListener();
+    }
+
     @Override
     public void onCanvasStateChanged() {
         render();
