@@ -1,44 +1,96 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- App information -->
-    <string name="app_name">DrawingApp</string>
-    
-    <!-- 📐 Outils de formes -->
+    <string name="app_name">Drawing Studio</string>
+    <string name="app_tagline">Toile propre, outils rapides, structure prête à évoluer.</string>
+    <string name="hero_label">Workspace</string>
+    <string name="editor_headline">Dessine vite, ajuste proprement, partage sans friction.</string>
+    <string name="editor_subtitle">Les commandes sont regroupées par intention pour garder une interface lisible et un code facile à faire grandir.</string>
+
     <string name="line_tool">Ligne</string>
     <string name="rectangle_tool">Rectangle</string>
     <string name="ellipse_tool">Ellipse</string>
-    
-    <!-- 🎨 Couleurs -->
-    <string name="select_red_color">Couleur rouge</string>
-    <string name="select_blue_color">Couleur bleue</string>
-    <string name="select_green_color">Couleur verte</string>
-    <string name="select_black_color">Couleur noire</string>
-    <string name="select_yellow_color">Couleur jaune</string>
-    <string name="select_orange_color">Couleur orange</string>
-    <string name="select_purple_color">Couleur violette</string>
-    <string name="select_pink_color">Couleur rose</string>
-    <string name="select_cyan_color">Couleur cyan</string>
-    <string name="select_lime_color">Couleur vert clair</string>
-    
-    <!-- ↩️ Actions -->
+
+    <string name="draw_mode">Dessin</string>
+    <string name="select_mode">Sélection</string>
+    <string name="erase_mode">Gomme</string>
+    <string name="share_action">Partager</string>
+    <string name="stroke_target">Contour</string>
+    <string name="fill_target">Fond</string>
+    <string name="no_fill_action">Sans fond</string>
+    <string name="color_target_label">Palette pour</string>
+    <string name="stroke_label">Épaisseur du trait</string>
+
+    <string name="panel_shapes_title">Formes</string>
+    <string name="panel_shapes_subtitle">Choisis une base simple avant de dessiner.</string>
+    <string name="panel_modes_title">Outils</string>
+    <string name="panel_modes_subtitle">Dessine, ajuste ou supprime selon le contexte.</string>
+    <string name="panel_actions_title">Actions</string>
+    <string name="panel_actions_subtitle">Gère la toile sans perdre le fil.</string>
+    <string name="panel_style_title">Style</string>
+    <string name="panel_style_subtitle">Contour, fond et épaisseur au même endroit.</string>
+    <string name="canvas_panel_title">Toile</string>
+    <string name="canvas_panel_subtitle">Trace directement avec le doigt dans cette zone.</string>
+
     <string name="undo_action">Annuler</string>
-    <string name="clear_action">Effacer</string>
+    <string name="clear_action">Vider</string>
+    <string name="delete_action">Supprimer</string>
+
     <string name="undo_description">Annuler la dernière action</string>
-    <string name="clear_description">Effacer tout le dessin</string>
-    
-    <!-- ✏️ Épaisseurs de trait -->
-    <string name="thin_stroke">Fin</string>
-    <string name="normal_stroke">Normal</string>
-    <string name="thick_stroke">Épais</string>
-    <string name="extra_thick_stroke">Très Épais</string>
-    
-    <!-- 📝 Descriptions d'accessibilité -->
+    <string name="clear_description">Vider toute la toile</string>
+    <string name="delete_description">Supprimer la figure sélectionnée</string>
+    <string name="share_description">Partager le dessin courant</string>
     <string name="draw_line_description">Dessiner une ligne</string>
     <string name="draw_rectangle_description">Dessiner un rectangle</string>
     <string name="draw_ellipse_description">Dessiner une ellipse</string>
-    <string name="thin_stroke_description">Trait fin</string>
-    <string name="normal_stroke_description">Trait normal</string>
-    <string name="thick_stroke_description">Trait épais</string>
-    <string name="extra_thick_stroke_description">Trait très épais</string>
+    <string name="draw_mode_description">Activer le mode dessin</string>
+    <string name="select_mode_description">Sélectionner puis déplacer une figure</string>
+    <string name="erase_mode_description">Effacer une figure en la touchant</string>
+    <string name="stroke_seekbar_description">Régler l\'épaisseur du trait</string>
     <string name="drawing_canvas_description">Zone de dessin</string>
+    <string name="share_chooser">Partager le dessin</string>
+
+    <string name="color_name_red">Rouge</string>
+    <string name="color_name_blue">Bleu</string>
+    <string name="color_name_green">Vert</string>
+    <string name="color_name_black">Noir</string>
+    <string name="color_name_yellow">Jaune</string>
+    <string name="color_name_orange">Orange</string>
+    <string name="color_name_purple">Violet</string>
+    <string name="color_name_pink">Rose</string>
+    <string name="color_name_cyan">Cyan</string>
+    <string name="color_name_lime">Lime</string>
+
+    <string name="select_color_description">Choisir %1$s</string>
+
+    <string name="status_draw_mode">Dessine une forme, puis passe en sélection pour l\'ajuster.</string>
+    <string name="status_select_mode_idle">Touche une figure puis glisse pour la déplacer.</string>
+    <string name="status_select_mode_active">Figure sélectionnée. Change son style ou glisse pour la déplacer.</string>
+    <string name="status_erase_mode">Touche une figure pour la supprimer rapidement.</string>
+
+    <string name="summary_mode">Mode %1$s</string>
+    <string name="summary_shape">%1$s</string>
+    <string name="summary_style">%1$s | %2$d px | Fond %3$s</string>
+    <string name="summary_fill_none">Sans fond</string>
+    <string name="custom_color_label">Personnalisée</string>
+    <string name="selection_active">Figure sélectionnée</string>
+    <string name="selection_inactive">Aucune sélection</string>
+    <string name="stroke_value_format">%1$d px</string>
+    <string name="stroke_value_placeholder">8 px</string>
+
+    <string name="message_shape_selected">Forme active : %1$s</string>
+    <string name="message_mode_selected">Mode actif : %1$s</string>
+    <string name="message_palette_target">Palette appliquée au %1$s</string>
+    <string name="message_stroke_color">Contour en %1$s</string>
+    <string name="message_fill_color">Fond en %1$s</string>
+    <string name="message_fill_disabled">Fond désactivé</string>
+    <string name="message_stroke_width">Épaisseur : %1$d px</string>
+    <string name="message_undo_done">Dernière action annulée</string>
+    <string name="message_undo_empty">Aucune action à annuler</string>
+    <string name="message_delete_done">Figure supprimée</string>
+    <string name="message_delete_empty">Sélectionne une figure avant de supprimer</string>
+    <string name="message_canvas_cleared">Toile effacée</string>
+    <string name="message_canvas_already_empty">La toile est déjà vide</string>
+    <string name="message_share_unavailable">Le dessin n\'est pas encore prêt</string>
+    <string name="message_share_prepare_error">Impossible de préparer le partage</string>
+    <string name="message_share_export_error">Erreur pendant la création de l\'image</string>
 </resources>
