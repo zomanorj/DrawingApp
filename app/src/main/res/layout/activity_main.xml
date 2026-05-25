@@ -1,25 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_editor_screen"
-    android:orientation="vertical">
+    android:background="@drawable/bg_editor_screen">
 
+    <!-- ═══════════════════════════════════════════════════════════════════
+         TOOLBAR — ancré en haut
+         ═══════════════════════════════════════════════════════════════════ -->
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/topAppBar"
         style="@style/Widget.DrawingApp.Toolbar"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:subtitle="@string/app_tagline"
-        app:title="@string/app_name" />
+        app:title="@string/app_name"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- ═══════════════════════════════════════════════════════════════════
+         HERO CARD — sous la toolbar
+         ═══════════════════════════════════════════════════════════════════ -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/heroCard"
         style="@style/Widget.DrawingApp.HeroCard"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_medium"
-        android:layout_marginTop="@dimen/margin_tiny">
+        android:layout_marginTop="@dimen/margin_tiny"
+        app:layout_constraintTop_toBottomOf="@id/topAppBar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -82,11 +95,19 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- ═══════════════════════════════════════════════════════════════════
+         PANNEAUX DE CONTRÔLE — scroll horizontal sous le hero
+         Contient : Formes | Outils | Actions
+         ═══════════════════════════════════════════════════════════════════ -->
     <HorizontalScrollView
-        android:layout_width="match_parent"
+        android:id="@+id/scrollPanels"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_small"
-        android:scrollbars="none">
+        android:scrollbars="none"
+        app:layout_constraintTop_toBottomOf="@id/heroCard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="wrap_content"
@@ -94,6 +115,7 @@
             android:orientation="horizontal"
             android:paddingHorizontal="@dimen/margin_medium">
 
+            <!-- Panel : Formes -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.DrawingApp.SectionCard"
                 android:layout_width="@dimen/control_panel_width"
@@ -151,6 +173,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Panel : Outils -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.DrawingApp.SectionCard"
                 android:layout_width="@dimen/control_panel_width"
@@ -208,6 +231,7 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
+            <!-- Panel : Actions -->
             <com.google.android.material.card.MaterialCardView
                 style="@style/Widget.DrawingApp.SectionCard"
                 android:layout_width="@dimen/control_panel_width"
@@ -276,12 +300,20 @@
         </LinearLayout>
     </HorizontalScrollView>
 
+    <!-- ═══════════════════════════════════════════════════════════════════
+         PANNEAU STYLE — ancré en bas
+         Contient : cible couleur | épaisseur | palette
+         ═══════════════════════════════════════════════════════════════════ -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/styleCard"
         style="@style/Widget.DrawingApp.SectionCard"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_medium"
-        android:layout_marginTop="@dimen/margin_small">
+        android:layout_marginBottom="@dimen/margin_medium"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -305,6 +337,7 @@
                 android:textColor="@color/ink_soft"
                 android:textSize="@dimen/text_small" />
 
+            <!-- Ligne : cible couleur + bouton sans fond -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -346,10 +379,11 @@
                     android:text="@string/no_fill_action" />
             </LinearLayout>
 
+            <!-- Ligne : label épaisseur + valeur numérique -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_marginTop="@dimen/margin_small"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -384,6 +418,7 @@
                 android:progressTint="@color/brand_primary"
                 android:thumbTint="@color/brand_accent" />
 
+            <!-- Palette de couleurs scrollable -->
             <HorizontalScrollView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -400,22 +435,38 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
+    <!-- ═══════════════════════════════════════════════════════════════════
+         STATUS TEXT — juste au-dessus du panneau style
+         ═══════════════════════════════════════════════════════════════════ -->
     <TextView
         android:id="@+id/tvStatus"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_medium"
-        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_tiny"
         android:text="@string/status_draw_mode"
         android:textColor="@color/ink_soft"
-        android:textSize="@dimen/text_small" />
+        android:textSize="@dimen/text_small"
+        app:layout_constraintBottom_toTopOf="@id/styleCard"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- ═══════════════════════════════════════════════════════════════════
+         CANVAS — remplit tout l'espace entre les panneaux et le status
+         Haut : sous scrollPanels | Bas : au-dessus de tvStatus
+         ═══════════════════════════════════════════════════════════════════ -->
     <com.google.android.material.card.MaterialCardView
+        android:id="@+id/canvasCard"
         style="@style/Widget.DrawingApp.CanvasCard"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_margin="@dimen/margin_medium"
-        android:layout_weight="1">
+        android:layout_marginHorizontal="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_small"
+        android:layout_marginBottom="@dimen/margin_tiny"
+        app:layout_constraintTop_toBottomOf="@id/scrollPanels"
+        app:layout_constraintBottom_toTopOf="@id/tvStatus"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -451,4 +502,4 @@
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 
-</LinearLayout>
+</androidx.constraintlayout.widget.ConstraintLayout>
