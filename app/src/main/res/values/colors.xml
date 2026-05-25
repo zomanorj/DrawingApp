@@ -39,4 +39,8 @@
     <color name="drawing_pink">#AD1457</color>
     <color name="drawing_cyan">#00838F</color>
     <color name="drawing_lime">#558B2F</color>
+    <!-- UI 3 — palette étendue -->
+    <color name="drawing_white">#FFFFFF</color>
+    <color name="drawing_brown">#795548</color>
+    <color name="drawing_grey">#9E9E9E</color>
 </resources>

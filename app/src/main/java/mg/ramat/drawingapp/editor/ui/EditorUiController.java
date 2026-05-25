@@ -1,5 +1,7 @@
 package mg.ramat.drawingapp.editor.ui;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
@@ -7,14 +9,15 @@ import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
-import android.widget.SeekBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 
 import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.slider.Slider;
+import com.google.android.material.snackbar.Snackbar;
 
 import java.util.EnumMap;
 import java.util.LinkedHashMap;
@@ -32,33 +35,54 @@ import mg.ramat.drawingapp.views.CanvasStateListener;
 
 public final class EditorUiController implements CanvasStateListener {
 
-    private static final int DEFAULT_STROKE_WIDTH = 8;
+    // ── Constantes ─────────────────────────────────────────────────────────
+    private static final int   DEFAULT_STROKE_WIDTH       = 8;
+    /** Facteur de zoom du bouton lors d'une sélection (animation scale-pop). */
+    private static final float ANIM_SCALE_PEAK            = 1.15f;
+    /** Durée de la montée en echelle (ms). */
+    private static final long  ANIM_SCALE_UP_DURATION_MS  = 120L;
+    /** Durée de la descente en echelle (ms). */
+    private static final long  ANIM_SCALE_DOWN_DURATION_MS = 80L;
 
-    private final Context context;
-    private final ActivityMainBinding binding;
-    private final Runnable shareAction;
-    private final List<PaletteColor> palette = PaletteColor.defaultPalette();
+    // ── Champs ─────────────────────────────────────────────────────────────
+    private final Context              context;
+    private final ActivityMainBinding  binding;
+    private final Runnable             shareAction;
+    private final List<PaletteColor>   palette        = PaletteColor.defaultPalette();
     private final Map<MaterialButton, PaletteColor> paletteButtons = new LinkedHashMap<>();
-    private final Map<FigureType, Integer> figureButtons = new EnumMap<>(FigureType.class);
-    private final Map<ToolMode, Integer> modeButtons = new EnumMap<>(ToolMode.class);
+    private final Map<FigureType, Integer>          figureButtons  = new EnumMap<>(FigureType.class);
+    private final Map<ToolMode, Integer>            modeButtons    = new EnumMap<>(ToolMode.class);
 
     private ColorTarget colorTarget = ColorTarget.STROKE;
+    /** Vrai pendant render() pour bloquer les listeners d'UI qui déclencheraient une boucle. */
     private boolean isRenderingState;
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // Constructeur
+    // ═══════════════════════════════════════════════════════════════════════
+
     public EditorUiController(Context context, ActivityMainBinding binding, Runnable shareAction) {
-        this.context = context;
-        this.binding = binding;
+        this.context     = context;
+        this.binding     = binding;
         this.shareAction = shareAction;
     }
 
-    public void bind() {
-        figureButtons.put(FigureType.LINE, R.id.btnLine);
-        figureButtons.put(FigureType.RECTANGLE, R.id.btnRect);
-        figureButtons.put(FigureType.OVAL, R.id.btnOval);
+    // ═══════════════════════════════════════════════════════════════════════
+    // Initialisation
+    // ═══════════════════════════════════════════════════════════════════════
 
-        modeButtons.put(ToolMode.DRAW, R.id.btnDrawMode);
+    /**
+     * Connecte tous les listeners et initialise l'état de départ de la toile.
+     * À appeler depuis Activity.onCreate() après inflate du binding.
+     */
+    public void bind() {
+        figureButtons.put(FigureType.LINE,      R.id.btnLine);
+        figureButtons.put(FigureType.RECTANGLE, R.id.btnRect);
+        figureButtons.put(FigureType.OVAL,      R.id.btnOval);
+
+        modeButtons.put(ToolMode.DRAW,   R.id.btnDrawMode);
         modeButtons.put(ToolMode.SELECT, R.id.btnSelectMode);
-        modeButtons.put(ToolMode.ERASE, R.id.btnEraseMode);
+        modeButtons.put(ToolMode.ERASE,  R.id.btnEraseMode);
 
         configureShapeControls();
         configureModeControls();
@@ -72,13 +96,17 @@ public final class EditorUiController implements CanvasStateListener {
     }
 
     private void configureInitialState() {
-        binding.seekBarStroke.setProgress(DEFAULT_STROKE_WIDTH);
+        binding.sliderStroke.setValue(DEFAULT_STROKE_WIDTH);
         binding.drawingView.setFigureType(FigureType.RECTANGLE);
         binding.drawingView.setToolMode(ToolMode.DRAW);
         binding.drawingView.setStrokeColor(ContextCompat.getColor(context, R.color.drawing_red));
         binding.drawingView.setFillColor(Color.TRANSPARENT);
         binding.drawingView.setStrokeWidth(DEFAULT_STROKE_WIDTH);
     }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // Configuration des contrôles
+    // ═══════════════════════════════════════════════════════════════════════
 
     private void configureShapeControls() {
         binding.shapeToggleGroup.addOnButtonCheckedListener((group, checkedId, isChecked) -> {
@@ -89,6 +117,12 @@ public final class EditorUiController implements CanvasStateListener {
             FigureType selectedType = findFigureType(checkedId);
             if (selectedType == null) {
                 return;
+            }
+
+            // UI 2 — animation scale-pop sur le bouton sélectionné
+            View btn = group.findViewById(checkedId);
+            if (btn != null) {
+                animateButtonScale(btn);
             }
 
             binding.drawingView.setFigureType(selectedType);
@@ -106,6 +140,12 @@ public final class EditorUiController implements CanvasStateListener {
             ToolMode selectedMode = findToolMode(checkedId);
             if (selectedMode == null) {
                 return;
+            }
+
+            // UI 2 — animation scale-pop sur le bouton sélectionné
+            View btn = group.findViewById(checkedId);
+            if (btn != null) {
+                animateButtonScale(btn);
             }
 
             binding.drawingView.setToolMode(selectedMode);
@@ -132,39 +172,27 @@ public final class EditorUiController implements CanvasStateListener {
             render();
         });
 
-        // android:min="1" couvre API 26+. Pour API 24-25, on force le min ici.
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
-            binding.seekBarStroke.setMin(1);
-        }
-
-        binding.seekBarStroke.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (isRenderingState) {
-                    return;
-                }
-
-                int strokeValue = Math.max(1, progress);
-
-                if (strokeValue != progress) {
-                    seekBar.setProgress(strokeValue);
-                    return;
-                }
-
-                binding.drawingView.setStrokeWidth(strokeValue);
-                binding.tvStrokeValue.setText(context.getString(R.string.stroke_value_format, strokeValue));
-                render();
+        // UI 6 — Slider MD3 remplace SeekBar
+        binding.sliderStroke.addOnChangeListener((slider, value, fromUser) -> {
+            if (isRenderingState || !fromUser) {
+                return;
             }
 
+            int strokeValue = Math.round(value);
+            binding.drawingView.setStrokeWidth(strokeValue);
+            binding.tvStrokeValue.setText(context.getString(R.string.stroke_value_format, strokeValue));
+            render();
+        });
+
+        binding.sliderStroke.addOnSliderTouchListener(new Slider.OnSliderTouchListener() {
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
+            public void onStartTrackingTouch(@NonNull Slider slider) { }
 
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
+            public void onStopTrackingTouch(@NonNull Slider slider) {
                 showMessage(context.getString(
                         R.string.message_stroke_width,
-                        Math.max(1, seekBar.getProgress())
+                        Math.round(slider.getValue())
                 ));
             }
         });
@@ -177,37 +205,43 @@ public final class EditorUiController implements CanvasStateListener {
             } else {
                 showMessage(context.getString(R.string.message_undo_empty));
             }
-
             render();
         });
 
+        // UI 5 — Snackbar avec action Annuler sur suppression
         binding.btnDelete.setOnClickListener(v -> {
             if (binding.drawingView.deleteSelectedFigure()) {
-                showMessage(context.getString(R.string.message_delete_done));
+                Snackbar.make(binding.getRoot(), R.string.message_delete_done, Snackbar.LENGTH_LONG)
+                        .setAction(R.string.undo_action, undoView -> {
+                            binding.drawingView.undo();
+                            render();
+                        })
+                        .show();
             } else {
                 showMessage(context.getString(R.string.message_delete_empty));
             }
-
             render();
         });
 
         binding.btnClear.setOnClickListener(v -> {
-            // hasContent() inclut les tracés de gomme, contrairement à hasFigures()
             if (binding.drawingView.hasContent()) {
                 binding.drawingView.clearAll();
                 showMessage(context.getString(R.string.message_canvas_cleared));
             } else {
                 showMessage(context.getString(R.string.message_canvas_already_empty));
             }
-
             render();
         });
 
         binding.btnShare.setOnClickListener(v -> shareAction.run());
     }
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // Palette
+    // ═══════════════════════════════════════════════════════════════════════
+
     private void buildPaletteButtons() {
-        int swatchSize = context.getResources().getDimensionPixelSize(R.dimen.palette_swatch_size);
+        int swatchSize    = context.getResources().getDimensionPixelSize(R.dimen.palette_swatch_size);
         int swatchSpacing = context.getResources().getDimensionPixelSize(R.dimen.margin_small);
 
         for (PaletteColor colorOption : palette) {
@@ -217,9 +251,9 @@ public final class EditorUiController implements CanvasStateListener {
                     0
             );
 
-            LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(swatchSize, swatchSize);
-            layoutParams.setMarginEnd(swatchSpacing);
-            colorButton.setLayoutParams(layoutParams);
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(swatchSize, swatchSize);
+            lp.setMarginEnd(swatchSpacing);
+            colorButton.setLayoutParams(lp);
             colorButton.setContentDescription(context.getString(
                     R.string.select_color_description,
                     context.getString(colorOption.getLabelResId())
@@ -252,32 +286,42 @@ public final class EditorUiController implements CanvasStateListener {
         render();
     }
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // Rendu de l'état de l'UI
+    // ═══════════════════════════════════════════════════════════════════════
+
     private void render() {
         isRenderingState = true;
 
-        FigureType currentFigureType = binding.drawingView.getFigureType();
-        ToolMode currentToolMode = binding.drawingView.getToolMode();
-        int strokeWidth = Math.round(binding.drawingView.getCurrentStrokeWidth());
-        int currentStrokeColor = binding.drawingView.getCurrentStrokeColor();
-        int currentFillColor = binding.drawingView.getCurrentFillColor();
+        FigureType currentFigureType  = binding.drawingView.getFigureType();
+        ToolMode   currentToolMode    = binding.drawingView.getToolMode();
+        int        strokeWidth        = Math.round(binding.drawingView.getCurrentStrokeWidth());
+        int        currentStrokeColor = binding.drawingView.getCurrentStrokeColor();
+        int        currentFillColor   = binding.drawingView.getCurrentFillColor();
 
         Integer checkedFigureButtonId = figureButtons.get(currentFigureType);
-        if (checkedFigureButtonId != null && binding.shapeToggleGroup.getCheckedButtonId() != checkedFigureButtonId) {
+        if (checkedFigureButtonId != null
+                && binding.shapeToggleGroup.getCheckedButtonId() != checkedFigureButtonId) {
             binding.shapeToggleGroup.check(checkedFigureButtonId);
         }
 
         Integer checkedModeButtonId = modeButtons.get(currentToolMode);
-        if (checkedModeButtonId != null && binding.modeToggleGroup.getCheckedButtonId() != checkedModeButtonId) {
+        if (checkedModeButtonId != null
+                && binding.modeToggleGroup.getCheckedButtonId() != checkedModeButtonId) {
             binding.modeToggleGroup.check(checkedModeButtonId);
         }
 
-        int checkedTargetButtonId = colorTarget == ColorTarget.FILL ? R.id.btnFillTarget : R.id.btnStrokeTarget;
+        int checkedTargetButtonId = colorTarget == ColorTarget.FILL
+                ? R.id.btnFillTarget : R.id.btnStrokeTarget;
         if (binding.targetToggleGroup.getCheckedButtonId() != checkedTargetButtonId) {
             binding.targetToggleGroup.check(checkedTargetButtonId);
         }
 
-        if (binding.seekBarStroke.getProgress() != strokeWidth) {
-            binding.seekBarStroke.setProgress(strokeWidth);
+        // Slider : setValue uniquement si la valeur a changé (évite un callback inutile)
+        if (Math.round(binding.sliderStroke.getValue()) != strokeWidth) {
+            float clamped = Math.max(binding.sliderStroke.getValueFrom(),
+                    Math.min(binding.sliderStroke.getValueTo(), strokeWidth));
+            binding.sliderStroke.setValue(clamped);
         }
 
         binding.tvStrokeValue.setText(context.getString(R.string.stroke_value_format, strokeWidth));
@@ -296,10 +340,12 @@ public final class EditorUiController implements CanvasStateListener {
         );
         binding.tvStatus.setText(getStatusText(currentToolMode, binding.drawingView.hasSelectedFigure()));
 
-        updateButtonState(binding.btnUndo, binding.drawingView.canUndo());
+        updateButtonState(binding.btnUndo,   binding.drawingView.canUndo());
         updateButtonState(binding.btnDelete, binding.drawingView.hasSelectedFigure());
         updateNoFillState(currentFillColor == Color.TRANSPARENT);
-        updatePaletteSelection(colorTarget == ColorTarget.STROKE ? currentStrokeColor : currentFillColor);
+        updatePaletteSelection(
+                colorTarget == ColorTarget.STROKE ? currentStrokeColor : currentFillColor
+        );
 
         isRenderingState = false;
     }
@@ -310,50 +356,52 @@ public final class EditorUiController implements CanvasStateListener {
     }
 
     private void updateNoFillState(boolean isActive) {
-        int backgroundColor = ContextCompat.getColor(
-                context,
-                isActive ? R.color.brand_primary : R.color.surface_soft
-        );
+        int bgColor = ContextCompat.getColor(
+                context, isActive ? R.color.brand_primary : R.color.surface_soft);
         int textColor = ContextCompat.getColor(
-                context,
-                isActive ? R.color.white : R.color.ink_strong
-        );
+                context, isActive ? R.color.white : R.color.ink_strong);
         int strokeColor = ContextCompat.getColor(
-                context,
-                isActive ? R.color.brand_primary : R.color.stroke_soft
-        );
+                context, isActive ? R.color.brand_primary : R.color.stroke_soft);
 
-        binding.btnNoFill.setBackgroundTintList(ColorStateList.valueOf(backgroundColor));
+        binding.btnNoFill.setBackgroundTintList(ColorStateList.valueOf(bgColor));
         binding.btnNoFill.setStrokeColor(ColorStateList.valueOf(strokeColor));
         binding.btnNoFill.setTextColor(textColor);
     }
 
+    /**
+     * Met en valeur le swatch de la couleur active (contour renforcé + légère montée en échelle).
+     * UI 3 : indicateur d'état visuel dans la palette.
+     */
     private void updatePaletteSelection(int activeColor) {
-        int activeStrokeColor = ContextCompat.getColor(context, R.color.brand_primary);
+        int activeStrokeColor  = ContextCompat.getColor(context, R.color.brand_primary);
         int defaultStrokeColor = ContextCompat.getColor(context, R.color.stroke_soft);
-        int activeStrokeWidth = context.getResources().getDimensionPixelSize(R.dimen.outline_width_active);
+        int activeStrokeWidth  = context.getResources().getDimensionPixelSize(R.dimen.outline_width_active);
         int defaultStrokeWidth = context.getResources().getDimensionPixelSize(R.dimen.outline_width_regular);
 
         for (Map.Entry<MaterialButton, PaletteColor> entry : paletteButtons.entrySet()) {
-            MaterialButton button = entry.getKey();
-            boolean isActive = entry.getValue().resolveColor(context) == activeColor;
+            MaterialButton button  = entry.getKey();
+            boolean        isActive = entry.getValue().resolveColor(context) == activeColor;
 
             button.setStrokeColor(ColorStateList.valueOf(isActive ? activeStrokeColor : defaultStrokeColor));
             button.setStrokeWidth(isActive ? activeStrokeWidth : defaultStrokeWidth);
+            button.setElevation(isActive ? 4f : 0f);
             button.setScaleX(isActive ? 1.05f : 1f);
             button.setScaleY(isActive ? 1.05f : 1f);
         }
     }
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // Helpers — labels et textes
+    // ═══════════════════════════════════════════════════════════════════════
+
     private CharSequence getStatusText(ToolMode toolMode, boolean hasSelection) {
         if (toolMode == ToolMode.SELECT) {
-            return context.getText(hasSelection ? R.string.status_select_mode_active : R.string.status_select_mode_idle);
+            return context.getText(
+                    hasSelection ? R.string.status_select_mode_active : R.string.status_select_mode_idle);
         }
-
         if (toolMode == ToolMode.ERASE) {
             return context.getText(R.string.status_erase_mode);
         }
-
         return context.getText(R.string.status_draw_mode);
     }
 
@@ -361,102 +409,101 @@ public final class EditorUiController implements CanvasStateListener {
         if (color == Color.TRANSPARENT) {
             return context.getString(R.string.summary_fill_none);
         }
-
-        for (PaletteColor paletteColor : palette) {
-            if (paletteColor.resolveColor(context) == color) {
-                return context.getString(paletteColor.getLabelResId());
+        for (PaletteColor pc : palette) {
+            if (pc.resolveColor(context) == color) {
+                return context.getString(pc.getLabelResId());
             }
         }
-
         return context.getString(R.string.custom_color_label);
     }
 
     private String getFillSummary(int fillColor) {
-        if (fillColor == Color.TRANSPARENT) {
-            return context.getString(R.string.summary_fill_none);
-        }
-
-        return getColorName(fillColor);
+        return fillColor == Color.TRANSPARENT
+                ? context.getString(R.string.summary_fill_none)
+                : getColorName(fillColor);
     }
 
     private FigureType findFigureType(int checkedId) {
-        for (Map.Entry<FigureType, Integer> entry : figureButtons.entrySet()) {
-            if (entry.getValue() == checkedId) {
-                return entry.getKey();
-            }
+        for (Map.Entry<FigureType, Integer> e : figureButtons.entrySet()) {
+            if (e.getValue() == checkedId) return e.getKey();
         }
-
         return null;
     }
 
     private ToolMode findToolMode(int checkedId) {
-        for (Map.Entry<ToolMode, Integer> entry : modeButtons.entrySet()) {
-            if (entry.getValue() == checkedId) {
-                return entry.getKey();
-            }
+        for (Map.Entry<ToolMode, Integer> e : modeButtons.entrySet()) {
+            if (e.getValue() == checkedId) return e.getKey();
         }
-
         return null;
     }
 
     private String getFigureLabel(FigureType figureType) {
-        if (figureType == FigureType.LINE) {
-            return context.getString(R.string.line_tool);
-        }
-
-        if (figureType == FigureType.OVAL) {
-            return context.getString(R.string.ellipse_tool);
-        }
-
+        if (figureType == FigureType.LINE) return context.getString(R.string.line_tool);
+        if (figureType == FigureType.OVAL) return context.getString(R.string.ellipse_tool);
         return context.getString(R.string.rectangle_tool);
     }
 
     private String getModeLabel(ToolMode toolMode) {
-        if (toolMode == ToolMode.SELECT) {
-            return context.getString(R.string.select_mode);
-        }
-
-        if (toolMode == ToolMode.ERASE) {
-            return context.getString(R.string.erase_mode);
-        }
-
+        if (toolMode == ToolMode.SELECT) return context.getString(R.string.select_mode);
+        if (toolMode == ToolMode.ERASE)  return context.getString(R.string.erase_mode);
         return context.getString(R.string.draw_mode);
     }
 
     private String getTargetLabel(ColorTarget target) {
-        return context.getString(target == ColorTarget.FILL ? R.string.fill_target : R.string.stroke_target);
+        return context.getString(
+                target == ColorTarget.FILL ? R.string.fill_target : R.string.stroke_target);
     }
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // Feedback utilisateur — Snackbar (UI 5)
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /** Affiche un message court via Snackbar ancré sur la racine du layout. */
     private void showMessage(String message) {
-        Toast.makeText(context, message, Toast.LENGTH_SHORT).show();
+        Snackbar.make(binding.getRoot(), message, Snackbar.LENGTH_SHORT).show();
     }
 
+    // ═══════════════════════════════════════════════════════════════════════
+    // Animation scale-pop (UI 2)
+    // ═══════════════════════════════════════════════════════════════════════
+
     /**
-     * Libère la référence circulaire DrawingView → EditorUiController → binding → Activity.
-     * À appeler depuis Activity.onDestroy() pour permettre au GC de collecter l'Activity.
+     * Anime un bouton avec un effet "pop" : 1.0 → 1.15 → 1.0.
+     * Durées : montée 120 ms, descente 80 ms (total 200 ms).
+     *
+     * @param view le bouton à animer
      */
-    public void detach() {
-        binding.drawingView.removeCanvasStateListener();
+    private static void animateButtonScale(View view) {
+        ObjectAnimator upX   = ObjectAnimator.ofFloat(view, "scaleX", 1f, ANIM_SCALE_PEAK);
+        ObjectAnimator upY   = ObjectAnimator.ofFloat(view, "scaleY", 1f, ANIM_SCALE_PEAK);
+        ObjectAnimator downX = ObjectAnimator.ofFloat(view, "scaleX", ANIM_SCALE_PEAK, 1f);
+        ObjectAnimator downY = ObjectAnimator.ofFloat(view, "scaleY", ANIM_SCALE_PEAK, 1f);
+
+        AnimatorSet scaleUp = new AnimatorSet();
+        scaleUp.playTogether(upX, upY);
+        scaleUp.setDuration(ANIM_SCALE_UP_DURATION_MS);
+
+        AnimatorSet scaleDown = new AnimatorSet();
+        scaleDown.playTogether(downX, downY);
+        scaleDown.setDuration(ANIM_SCALE_DOWN_DURATION_MS);
+
+        AnimatorSet pop = new AnimatorSet();
+        pop.playSequentially(scaleUp, scaleDown);
+        pop.start();
     }
 
-    @Override
-    public void onCanvasStateChanged() {
-        render();
-    }
+    // ═══════════════════════════════════════════════════════════════════════
+    // BottomSheet d'édition de style (double-tap sur figure)
+    // ═══════════════════════════════════════════════════════════════════════
 
     /**
-     * Ouvre un BottomSheetDialog pré-rempli avec le style actuel de la figure.
-     * Déclenché par un double-tap sur une figure sélectionnée (DrawingView → GestureDetector).
+     * Ouvre un BottomSheetDialog pré-rempli avec le style courant de la figure sélectionnée.
+     * Déclenché par un double-tap en mode SELECT (DrawingView → GestureDetector).
      *
-     * L'utilisateur peut modifier :
-     *  – la couleur du contour (palette de 10 couleurs)
-     *  – la couleur du fond (idem + bouton "Sans fond")
-     *  – l'épaisseur du trait (SeekBar 1–24 px)
+     * Sur "Appliquer" : {@link mg.ramat.drawingapp.views.DrawingView#applyStyleToSelected}
+     * crée un seul snapshot undo pour les trois changements.
      *
-     * Sur "Appliquer" : applyStyleToSelected() crée un seul snapshot undo
-     * pour les trois changements simultanés.
-     *
-     * @param figure la figure dont on veut éditer le style (fournie par DrawingView)
+     * @param figure la figure dont on veut éditer le style
      */
     @Override
     public void onEditFigureRequested(Figure figure) {
@@ -465,12 +512,12 @@ public final class EditorUiController implements CanvasStateListener {
             return;
         }
 
-        BottomSheetDialog sheet = new BottomSheetDialog(context);
-        View sheetView = LayoutInflater.from(context)
+        BottomSheetDialog sheet    = new BottomSheetDialog(context);
+        View              sheetView = LayoutInflater.from(context)
                 .inflate(R.layout.bottom_sheet_edit_figure, null);
         sheet.setContentView(sheetView);
 
-        // État temporaire du style en cours d'édition (tableau à 1 élément pour mutation dans lambda)
+        // État temporaire du style (tableau 1 élément = mutable dans lambda)
         int[]   pendingStrokeColor = { originalStyle.getStrokeColor() };
         int[]   pendingFillColor   = { originalStyle.getFillColor() };
         float[] pendingStrokeWidth = { originalStyle.getStrokeWidth() };
@@ -495,23 +542,19 @@ public final class EditorUiController implements CanvasStateListener {
             refreshSheetPalette(paletteFill, Color.TRANSPARENT);
         });
 
-        // ── Seekbar épaisseur ──────────────────────────────────────────────
-        SeekBar seekBar    = sheetView.findViewById(R.id.sheetSeekBar);
-        TextView tvStroke  = sheetView.findViewById(R.id.sheetTvStrokeValue);
+        // ── Slider épaisseur (UI 6) ────────────────────────────────────────
+        Slider   sheetSlider = sheetView.findViewById(R.id.sheetSlider);
+        TextView tvStroke    = sheetView.findViewById(R.id.sheetTvStrokeValue);
 
-        seekBar.setProgress(Math.round(originalStyle.getStrokeWidth()));
-        tvStroke.setText(context.getString(R.string.stroke_value_format,
-                Math.round(originalStyle.getStrokeWidth())));
+        float initialWidth = originalStyle.getStrokeWidth();
+        sheetSlider.setValue(Math.max(sheetSlider.getValueFrom(),
+                Math.min(sheetSlider.getValueTo(), Math.round(initialWidth))));
+        tvStroke.setText(context.getString(R.string.stroke_value_format, Math.round(initialWidth)));
 
-        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar s, int progress, boolean fromUser) {
-                int clamped = Math.max(1, progress);
-                pendingStrokeWidth[0] = clamped;
-                tvStroke.setText(context.getString(R.string.stroke_value_format, clamped));
-            }
-            @Override public void onStartTrackingTouch(SeekBar s) { }
-            @Override public void onStopTrackingTouch(SeekBar s)   { }
+        sheetSlider.addOnChangeListener((slider, value, fromUser) -> {
+            int width = Math.round(value);
+            pendingStrokeWidth[0] = width;
+            tvStroke.setText(context.getString(R.string.stroke_value_format, width));
         });
 
         // ── Boutons Annuler / Appliquer ────────────────────────────────────
@@ -537,8 +580,8 @@ public final class EditorUiController implements CanvasStateListener {
      * Construit une rangée de swatches de couleur dans le conteneur donné.
      * Chaque swatch appelle {@code onColorPicked} avec la couleur résolue.
      *
-     * @param container   conteneur horizontal dans lequel ajouter les boutons
-     * @param activeColor couleur initialement sélectionnée (reçoit un contour actif)
+     * @param container    conteneur horizontal où ajouter les boutons
+     * @param activeColor  couleur initialement sélectionnée (reçoit le contour actif)
      * @param onColorPicked callback appelé quand l'utilisateur choisit une couleur
      */
     private void buildSheetPalette(LinearLayout container, int activeColor,
@@ -570,20 +613,21 @@ public final class EditorUiController implements CanvasStateListener {
             boolean isActive = resolved == activeColor;
             btn.setStrokeColor(ColorStateList.valueOf(isActive ? activeStroke : defaultStroke));
             btn.setStrokeWidth(isActive ? activeWidth : defaultWidth);
+            btn.setElevation(isActive ? 4f : 0f);
             btn.setScaleX(isActive ? 1.05f : 1f);
             btn.setScaleY(isActive ? 1.05f : 1f);
 
             btn.setOnClickListener(v -> onColorPicked.onColorPicked(resolved));
-
             container.addView(btn);
         }
     }
 
     /**
-     * Met à jour visuellement les bordures de la palette pour refléter la nouvelle couleur active.
+     * Met à jour visuellement les bordures et l'élévation des swatches
+     * pour refléter la nouvelle couleur active.
      *
      * @param container   palette à rafraîchir
-     * @param activeColor couleur désormais active
+     * @param activeColor couleur désormais sélectionnée
      */
     private void refreshSheetPalette(LinearLayout container, int activeColor) {
         int activeStroke  = ContextCompat.getColor(context, R.color.brand_primary);
@@ -593,9 +637,7 @@ public final class EditorUiController implements CanvasStateListener {
 
         for (int i = 0; i < container.getChildCount(); i++) {
             if (!(container.getChildAt(i) instanceof MaterialButton)) continue;
-            MaterialButton btn = (MaterialButton) container.getChildAt(i);
-
-            // Retrouver la couleur du bouton via sa teinture de fond
+            MaterialButton btn      = (MaterialButton) container.getChildAt(i);
             int btnColor = btn.getBackgroundTintList() != null
                     ? btn.getBackgroundTintList().getDefaultColor()
                     : Color.TRANSPARENT;
@@ -603,12 +645,36 @@ public final class EditorUiController implements CanvasStateListener {
             boolean isActive = btnColor == activeColor;
             btn.setStrokeColor(ColorStateList.valueOf(isActive ? activeStroke : defaultStroke));
             btn.setStrokeWidth(isActive ? activeWidth : defaultWidth);
+            btn.setElevation(isActive ? 4f : 0f);
             btn.setScaleX(isActive ? 1.05f : 1f);
             btn.setScaleY(isActive ? 1.05f : 1f);
         }
     }
 
-    /** Interface fonctionnelle pour la sélection d'une couleur dans le BottomSheet. */
+    // ═══════════════════════════════════════════════════════════════════════
+    // Cycle de vie
+    // ═══════════════════════════════════════════════════════════════════════
+
+    /**
+     * Libère la référence circulaire DrawingView → EditorUiController → Activity.
+     * À appeler depuis Activity.onDestroy() pour permettre au GC de collecter l'Activity.
+     */
+    public void detach() {
+        binding.drawingView.removeCanvasStateListener();
+    }
+
+    // ═══════════════════════════════════════════════════════════════════════
+    // CanvasStateListener
+    // ═══════════════════════════════════════════════════════════════════════
+
+    @Override
+    public void onCanvasStateChanged() {
+        render();
+    }
+
+    // ── Interface fonctionnelle privée ─────────────────────────────────────
+
+    /** Callback pour la sélection d'une couleur dans le BottomSheet. */
     private interface ColorPickedCallback {
         void onColorPicked(int color);
     }

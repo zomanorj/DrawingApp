@@ -59,6 +59,9 @@
     <string name="color_name_pink">Rose</string>
     <string name="color_name_cyan">Cyan</string>
     <string name="color_name_lime">Lime</string>
+    <string name="color_name_white">Blanc</string>
+    <string name="color_name_brown">Marron</string>
+    <string name="color_name_grey">Gris</string>
 
     <string name="select_color_description">Choisir %1$s</string>
 

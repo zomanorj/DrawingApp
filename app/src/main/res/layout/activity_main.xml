@@ -96,8 +96,8 @@
     </com.google.android.material.card.MaterialCardView>
 
     <!-- ═══════════════════════════════════════════════════════════════════
-         PANNEAUX DE CONTRÔLE — scroll horizontal sous le hero
-         Contient : Formes | Outils | Actions
+         PANNEAUX DE CONTRÔLE — scroll horizontal
+         Formes | Outils | Actions — chaque bouton a une icône MD3
          ═══════════════════════════════════════════════════════════════════ -->
     <HorizontalScrollView
         android:id="@+id/scrollPanels"
@@ -156,19 +156,22 @@
                             android:id="@+id/btnLine"
                             style="@style/Widget.DrawingApp.ToggleButton"
                             android:contentDescription="@string/draw_line_description"
-                            android:text="@string/line_tool" />
+                            android:text="@string/line_tool"
+                            app:icon="@drawable/ic_tool_line" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnRect"
                             style="@style/Widget.DrawingApp.ToggleButton"
                             android:contentDescription="@string/draw_rectangle_description"
-                            android:text="@string/rectangle_tool" />
+                            android:text="@string/rectangle_tool"
+                            app:icon="@drawable/ic_tool_rect" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnOval"
                             style="@style/Widget.DrawingApp.ToggleButton"
                             android:contentDescription="@string/draw_ellipse_description"
-                            android:text="@string/ellipse_tool" />
+                            android:text="@string/ellipse_tool"
+                            app:icon="@drawable/ic_tool_oval" />
                     </com.google.android.material.button.MaterialButtonToggleGroup>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -214,19 +217,22 @@
                             android:id="@+id/btnDrawMode"
                             style="@style/Widget.DrawingApp.ToggleButton"
                             android:contentDescription="@string/draw_mode_description"
-                            android:text="@string/draw_mode" />
+                            android:text="@string/draw_mode"
+                            app:icon="@drawable/ic_tool_line" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnSelectMode"
                             style="@style/Widget.DrawingApp.ToggleButton"
                             android:contentDescription="@string/select_mode_description"
-                            android:text="@string/select_mode" />
+                            android:text="@string/select_mode"
+                            app:icon="@drawable/ic_tool_select" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnEraseMode"
                             style="@style/Widget.DrawingApp.ToggleButton"
                             android:contentDescription="@string/erase_mode_description"
-                            android:text="@string/erase_mode" />
+                            android:text="@string/erase_mode"
+                            app:icon="@drawable/ic_tool_eraser" />
                     </com.google.android.material.button.MaterialButtonToggleGroup>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -269,13 +275,15 @@
                             android:id="@+id/btnUndo"
                             style="@style/Widget.DrawingApp.ActionGridButton.Secondary"
                             android:contentDescription="@string/undo_description"
-                            android:text="@string/undo_action" />
+                            android:text="@string/undo_action"
+                            app:icon="@drawable/ic_action_undo" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnDelete"
                             style="@style/Widget.DrawingApp.ActionGridButton.Destructive"
                             android:contentDescription="@string/delete_description"
-                            android:text="@string/delete_action" />
+                            android:text="@string/delete_action"
+                            app:icon="@drawable/ic_action_delete" />
                     </LinearLayout>
 
                     <LinearLayout
@@ -287,13 +295,15 @@
                             android:id="@+id/btnClear"
                             style="@style/Widget.DrawingApp.ActionGridButton.Secondary"
                             android:contentDescription="@string/clear_description"
-                            android:text="@string/clear_action" />
+                            android:text="@string/clear_action"
+                            app:icon="@drawable/ic_action_clear" />
 
                         <com.google.android.material.button.MaterialButton
                             android:id="@+id/btnShare"
                             style="@style/Widget.DrawingApp.ActionGridButton.Primary"
                             android:contentDescription="@string/share_description"
-                            android:text="@string/share_action" />
+                            android:text="@string/share_action"
+                            app:icon="@drawable/ic_action_share" />
                     </LinearLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
@@ -302,7 +312,7 @@
 
     <!-- ═══════════════════════════════════════════════════════════════════
          PANNEAU STYLE — ancré en bas
-         Contient : cible couleur | épaisseur | palette
+         Slider remplace SeekBar (UI 6) : valueFrom=1, valueTo=50, stepSize=1
          ═══════════════════════════════════════════════════════════════════ -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/styleCard"
@@ -406,17 +416,18 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <SeekBar
-                android:id="@+id/seekBarStroke"
+            <!-- Slider MD3 (UI 6) — remplace SeekBar -->
+            <com.google.android.material.slider.Slider
+                android:id="@+id/sliderStroke"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/margin_small"
                 android:contentDescription="@string/stroke_seekbar_description"
-                android:max="24"
-                android:min="1"
-                android:progress="8"
-                android:progressTint="@color/brand_primary"
-                android:thumbTint="@color/brand_accent" />
+                app:labelBehavior="floating"
+                app:stepSize="1"
+                app:value="8"
+                app:valueFrom="1"
+                app:valueTo="50" />
 
             <!-- Palette de couleurs scrollable -->
             <HorizontalScrollView
@@ -453,7 +464,6 @@
 
     <!-- ═══════════════════════════════════════════════════════════════════
          CANVAS — remplit tout l'espace entre les panneaux et le status
-         Haut : sous scrollPanels | Bas : au-dessus de tvStatus
          ═══════════════════════════════════════════════════════════════════ -->
     <com.google.android.material.card.MaterialCardView
         android:id="@+id/canvasCard"

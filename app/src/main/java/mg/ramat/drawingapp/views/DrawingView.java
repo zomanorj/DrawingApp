@@ -11,6 +11,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
@@ -37,6 +38,11 @@ public class DrawingView extends View {
     private static final float ERASER_MIN_WIDTH_PX     = 30f;
     private static final float SELECTION_MARGIN        = 12f;
     private static final float HANDLE_HALF_SIZE        = 10f;
+
+    // Étiquette de dimensions (UI 4)
+    private static final float DIMENSION_TEXT_SIZE_SP  = 12f;
+    private static final float DIMENSION_LABEL_OFFSET  = 12f;  // dp au-dessus de la figure
+    private static final float DIMENSION_LABEL_PADDING =  6f;  // dp à l'intérieur de la pastille
 
     // ── État du canvas ──────────────────────────────────────────────────────
     private final List<Figure> figures       = new ArrayList<>();
@@ -67,9 +73,14 @@ public class DrawingView extends View {
     private int    canvasBackgroundColor;
 
     // ── Paints ─────────────────────────────────────────────────────────────
-    private final Paint selectionPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint handlePaint    = new Paint(Paint.ANTI_ALIAS_FLAG);
-    private final Paint eraserPaint    = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint selectionPaint  = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint handlePaint     = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private final Paint eraserPaint     = new Paint(Paint.ANTI_ALIAS_FLAG);
+    private Paint       dimensionPaint;
+    private Paint       dimensionBgPaint;
+
+    /** Densité de l'écran en dp/px, initialisée dans init(). */
+    private float displayDensity;
 
     // ── Listener ────────────────────────────────────────────────────────────
     private CanvasStateListener canvasStateListener;
@@ -134,6 +145,28 @@ public class DrawingView extends View {
                     }
                 }
         );
+
+        initDimensionPaints();
+    }
+
+    /** Initialise les paints pour l'étiquette de dimensions live (UI 4). */
+    private void initDimensionPaints() {
+        displayDensity = getResources().getDisplayMetrics().density;
+
+        float textSizePx = TypedValue.applyDimension(
+                TypedValue.COMPLEX_UNIT_SP,
+                DIMENSION_TEXT_SIZE_SP,
+                getResources().getDisplayMetrics()
+        );
+
+        dimensionPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        dimensionPaint.setColor(Color.WHITE);
+        dimensionPaint.setTextSize(textSizePx);
+        dimensionPaint.setTextAlign(Paint.Align.CENTER);
+        dimensionPaint.setShadowLayer(4f, 0f, 1f, Color.BLACK);
+
+        dimensionBgPaint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        dimensionBgPaint.setColor(0xCC000000);   // noir semi-transparent
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -220,7 +253,12 @@ public class DrawingView extends View {
         // Étape 3 — composite : les trous du bitmap laissent voir le fond de l'étape 1
         canvas.drawBitmap(mDrawingBitmap, 0, 0, null);
 
-        // Étape 4 — sélection par-dessus (ne doit pas être gommable)
+        // Étape 4 — étiquette de dimensions en temps réel pendant le tracé (UI 4)
+        if (currentFigure != null && toolMode == ToolMode.DRAW) {
+            drawDimensionLabel(canvas, currentFigure);
+        }
+
+        // Étape 5 — sélection par-dessus (ne doit pas être gommable)
         if (selectedFigure != null) {
             drawSelection(canvas, selectedFigure);
         }
@@ -694,6 +732,57 @@ public class DrawingView extends View {
         );
         canvas.drawRect(handle, handlePaint);
         canvas.drawRect(handle, selectionPaint);  // bordure de la couleur d'accent
+    }
+
+    /**
+     * Dessine une pastille semi-transparente avec les dimensions W × H dp de la figure,
+     * positionnée au-dessus du bord supérieur. Si la pastille sort du haut de l'écran,
+     * elle est rabattue en dessous de la figure. Appelée uniquement pendant un tracé actif.
+     */
+    private void drawDimensionLabel(Canvas canvas, Figure figure) {
+        int widthDp  = (int) (Math.abs(figure.getRight()  - figure.getLeft()) / displayDensity);
+        int heightDp = (int) (Math.abs(figure.getBottom() - figure.getTop())  / displayDensity);
+
+        if (widthDp == 0 && heightDp == 0) {
+            return;
+        }
+
+        String label     = widthDp + " × " + heightDp + " dp";
+        float  paddingPx = DIMENSION_LABEL_PADDING * displayDensity;
+        float  offsetPx  = DIMENSION_LABEL_OFFSET  * displayDensity;
+
+        float textWidth  = dimensionPaint.measureText(label);
+        float textHeight = dimensionPaint.descent() - dimensionPaint.ascent();
+
+        float pillWidth  = textWidth  + paddingPx * 2f;
+        float pillHeight = textHeight + paddingPx * 2f;
+
+        float cx       = (figure.getLeft() + figure.getRight())  / 2f;
+        float figureTop = Math.min(figure.getTop(), figure.getBottom());
+
+        // Tente de placer la pastille au-dessus ; repli en dessous si hors-écran
+        float pillTop;
+        float pillBottom;
+        if (figureTop - offsetPx - pillHeight >= 0f) {
+            pillBottom = figureTop - offsetPx;
+            pillTop    = pillBottom - pillHeight;
+        } else {
+            float figureBottom = Math.max(figure.getTop(), figure.getBottom());
+            pillTop    = figureBottom + offsetPx;
+            pillBottom = pillTop + pillHeight;
+        }
+
+        // Garde la pastille dans les bornes horizontales
+        float pillLeft = Math.max(0f, Math.min(cx - pillWidth / 2f, getWidth() - pillWidth));
+
+        canvas.drawRoundRect(
+                new RectF(pillLeft, pillTop, pillLeft + pillWidth, pillBottom),
+                paddingPx, paddingPx,
+                dimensionBgPaint
+        );
+
+        float textY = pillBottom - paddingPx - dimensionPaint.descent();
+        canvas.drawText(label, pillLeft + pillWidth / 2f, textY, dimensionPaint);
     }
 
     private void syncStyleFromSelection() {

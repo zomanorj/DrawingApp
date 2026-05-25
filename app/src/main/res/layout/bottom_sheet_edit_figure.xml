@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/padding_medium"
     android:paddingBottom="@dimen/padding_large">
 
-    <!-- Indicateur de glissement (Material Bottom Sheet handle) -->
+    <!-- Indicateur de glissement -->
     <View
         android:layout_width="40dp"
         android:layout_height="4dp"
@@ -115,15 +115,17 @@
             android:textStyle="bold" />
     </LinearLayout>
 
-    <SeekBar
-        android:id="@+id/sheetSeekBar"
+    <!-- Slider MD3 (UI 6) — remplace SeekBar -->
+    <com.google.android.material.slider.Slider
+        android:id="@+id/sheetSlider"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_large"
-        android:max="24"
-        android:min="1"
-        android:progressTint="@color/brand_primary"
-        android:thumbTint="@color/brand_accent" />
+        app:labelBehavior="floating"
+        app:stepSize="1"
+        app:value="8"
+        app:valueFrom="1"
+        app:valueTo="50" />
 
     <!-- Boutons d'action -->
     <LinearLayout
