@@ -93,4 +93,14 @@
     <string name="message_share_unavailable">Le dessin n\'est pas encore prêt</string>
     <string name="message_share_prepare_error">Impossible de préparer le partage</string>
     <string name="message_share_export_error">Erreur pendant la création de l\'image</string>
+
+    <!-- BottomSheet d'édition de figure -->
+    <string name="sheet_title">Modifier la figure</string>
+    <string name="sheet_stroke_color_label">Couleur du contour</string>
+    <string name="sheet_fill_color_label">Couleur du fond</string>
+    <string name="sheet_stroke_width_label">Épaisseur du trait</string>
+    <string name="sheet_cancel">Annuler</string>
+    <string name="sheet_apply">Appliquer</string>
+    <string name="sheet_hint_double_tap">Double-tapez une figure pour modifier son style.</string>
+    <string name="message_figure_updated">Style de la figure mis à jour</string>
 </resources>

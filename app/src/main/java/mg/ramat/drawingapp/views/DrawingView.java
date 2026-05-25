@@ -11,6 +11,7 @@ import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.RectF;
 import android.util.AttributeSet;
+import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 
@@ -73,6 +74,12 @@ public class DrawingView extends View {
     // ── Listener ────────────────────────────────────────────────────────────
     private CanvasStateListener canvasStateListener;
 
+    /**
+     * Détecte le double-tap pour ouvrir l'éditeur de style de la figure sélectionnée.
+     * Initialisé dans init() après que le contexte est disponible.
+     */
+    private GestureDetector gestureDetector;
+
     // ═══════════════════════════════════════════════════════════════════════
     // Constructeurs
     // ═══════════════════════════════════════════════════════════════════════
@@ -109,6 +116,24 @@ public class DrawingView extends View {
         eraserPaint.setStyle(Paint.Style.STROKE);
         eraserPaint.setStrokeCap(Paint.Cap.ROUND);
         eraserPaint.setStrokeJoin(Paint.Join.ROUND);
+
+        // Double-tap → ouvre l'éditeur de la figure sélectionnée
+        gestureDetector = new GestureDetector(
+                getContext(),
+                new GestureDetector.SimpleOnGestureListener() {
+                    @Override
+                    public boolean onDoubleTap(MotionEvent e) {
+                        // Déclenche l'édition uniquement si une figure est sélectionnée en mode SELECT
+                        if (toolMode == ToolMode.SELECT && selectedFigure != null) {
+                            if (canvasStateListener != null) {
+                                canvasStateListener.onEditFigureRequested(selectedFigure);
+                            }
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+        );
     }
 
     // ═══════════════════════════════════════════════════════════════════════
@@ -212,6 +237,10 @@ public class DrawingView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        // Le GestureDetector reçoit tous les événements pour détecter le double-tap.
+        // Ses callbacks (onDoubleTap…) s'exécutent de façon synchrone ici.
+        gestureDetector.onTouchEvent(event);
+
         float x = event.getX();
         float y = event.getY();
 
@@ -570,6 +599,33 @@ public class DrawingView extends View {
 
     public boolean hasSelectedFigure() {
         return selectedFigure != null;
+    }
+
+    /**
+     * Applique un style complet à la figure sélectionnée en un seul snapshot.
+     * Contrairement à appeler setStrokeColor() + setFillColor() + setStrokeWidth()
+     * séparément (3 entrées d'historique), cette méthode n'en crée qu'une seule.
+     * Appelée depuis le BottomSheet d'édition lors du clic "Appliquer".
+     *
+     * @param style le nouveau style à appliquer
+     * @return vrai si le style a été appliqué (figure bien sélectionnée)
+     */
+    public boolean applyStyleToSelected(FigureStyle style) {
+        if (selectedFigure == null) {
+            return false;
+        }
+
+        saveToHistory();    // un seul snapshot pour couleur + fond + épaisseur
+
+        selectedFigure.setStrokeColor(style.getStrokeColor());
+        selectedFigure.setFillColor(style.getFillColor());
+        selectedFigure.setStrokeWidth(style.getStrokeWidth());
+
+        currentStyle = style;   // synchronise le style courant de la toolbar
+
+        notifyCanvasStateChanged();
+        invalidate();
+        return true;
     }
 
     /**

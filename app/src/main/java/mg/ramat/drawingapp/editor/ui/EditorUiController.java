@@ -4,12 +4,16 @@ import android.content.Context;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.view.ContextThemeWrapper;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.SeekBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.core.content.ContextCompat;
 
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.button.MaterialButton;
 
 import java.util.EnumMap;
@@ -18,8 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 import mg.ramat.drawingapp.R;
+import mg.ramat.drawingapp.data.Figure;
 import mg.ramat.drawingapp.databinding.ActivityMainBinding;
 import mg.ramat.drawingapp.editor.model.ColorTarget;
+import mg.ramat.drawingapp.editor.model.FigureStyle;
 import mg.ramat.drawingapp.editor.model.FigureType;
 import mg.ramat.drawingapp.editor.model.ToolMode;
 import mg.ramat.drawingapp.views.CanvasStateListener;
@@ -436,5 +442,174 @@ public final class EditorUiController implements CanvasStateListener {
     @Override
     public void onCanvasStateChanged() {
         render();
+    }
+
+    /**
+     * Ouvre un BottomSheetDialog pré-rempli avec le style actuel de la figure.
+     * Déclenché par un double-tap sur une figure sélectionnée (DrawingView → GestureDetector).
+     *
+     * L'utilisateur peut modifier :
+     *  – la couleur du contour (palette de 10 couleurs)
+     *  – la couleur du fond (idem + bouton "Sans fond")
+     *  – l'épaisseur du trait (SeekBar 1–24 px)
+     *
+     * Sur "Appliquer" : applyStyleToSelected() crée un seul snapshot undo
+     * pour les trois changements simultanés.
+     *
+     * @param figure la figure dont on veut éditer le style (fournie par DrawingView)
+     */
+    @Override
+    public void onEditFigureRequested(Figure figure) {
+        FigureStyle originalStyle = binding.drawingView.getSelectedFigureStyle();
+        if (originalStyle == null) {
+            return;
+        }
+
+        BottomSheetDialog sheet = new BottomSheetDialog(context);
+        View sheetView = LayoutInflater.from(context)
+                .inflate(R.layout.bottom_sheet_edit_figure, null);
+        sheet.setContentView(sheetView);
+
+        // État temporaire du style en cours d'édition (tableau à 1 élément pour mutation dans lambda)
+        int[]   pendingStrokeColor = { originalStyle.getStrokeColor() };
+        int[]   pendingFillColor   = { originalStyle.getFillColor() };
+        float[] pendingStrokeWidth = { originalStyle.getStrokeWidth() };
+
+        // ── Palette contour ────────────────────────────────────────────────
+        LinearLayout paletteStroke = sheetView.findViewById(R.id.sheetPaletteStroke);
+        buildSheetPalette(paletteStroke, pendingStrokeColor[0], newColor -> {
+            pendingStrokeColor[0] = newColor;
+            refreshSheetPalette(paletteStroke, newColor);
+        });
+
+        // ── Palette fond + bouton "Sans fond" ──────────────────────────────
+        LinearLayout paletteFill = sheetView.findViewById(R.id.sheetPaletteFill);
+        buildSheetPalette(paletteFill, pendingFillColor[0], newColor -> {
+            pendingFillColor[0] = newColor;
+            refreshSheetPalette(paletteFill, newColor);
+        });
+
+        MaterialButton btnNoFill = sheetView.findViewById(R.id.sheetBtnNoFill);
+        btnNoFill.setOnClickListener(v -> {
+            pendingFillColor[0] = Color.TRANSPARENT;
+            refreshSheetPalette(paletteFill, Color.TRANSPARENT);
+        });
+
+        // ── Seekbar épaisseur ──────────────────────────────────────────────
+        SeekBar seekBar    = sheetView.findViewById(R.id.sheetSeekBar);
+        TextView tvStroke  = sheetView.findViewById(R.id.sheetTvStrokeValue);
+
+        seekBar.setProgress(Math.round(originalStyle.getStrokeWidth()));
+        tvStroke.setText(context.getString(R.string.stroke_value_format,
+                Math.round(originalStyle.getStrokeWidth())));
+
+        seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar s, int progress, boolean fromUser) {
+                int clamped = Math.max(1, progress);
+                pendingStrokeWidth[0] = clamped;
+                tvStroke.setText(context.getString(R.string.stroke_value_format, clamped));
+            }
+            @Override public void onStartTrackingTouch(SeekBar s) { }
+            @Override public void onStopTrackingTouch(SeekBar s)   { }
+        });
+
+        // ── Boutons Annuler / Appliquer ────────────────────────────────────
+        sheetView.findViewById(R.id.sheetBtnCancel)
+                .setOnClickListener(v -> sheet.dismiss());
+
+        sheetView.findViewById(R.id.sheetBtnApply).setOnClickListener(v -> {
+            FigureStyle newStyle = new FigureStyle(
+                    pendingStrokeColor[0],
+                    pendingFillColor[0],
+                    pendingStrokeWidth[0]
+            );
+            binding.drawingView.applyStyleToSelected(newStyle);
+            showMessage(context.getString(R.string.message_figure_updated));
+            sheet.dismiss();
+            render();
+        });
+
+        sheet.show();
+    }
+
+    /**
+     * Construit une rangée de swatches de couleur dans le conteneur donné.
+     * Chaque swatch appelle {@code onColorPicked} avec la couleur résolue.
+     *
+     * @param container   conteneur horizontal dans lequel ajouter les boutons
+     * @param activeColor couleur initialement sélectionnée (reçoit un contour actif)
+     * @param onColorPicked callback appelé quand l'utilisateur choisit une couleur
+     */
+    private void buildSheetPalette(LinearLayout container, int activeColor,
+                                   ColorPickedCallback onColorPicked) {
+        int swatchSize    = context.getResources().getDimensionPixelSize(R.dimen.palette_swatch_size);
+        int swatchSpacing = context.getResources().getDimensionPixelSize(R.dimen.margin_small);
+        int activeStroke  = ContextCompat.getColor(context, R.color.brand_primary);
+        int defaultStroke = ContextCompat.getColor(context, R.color.stroke_soft);
+        int activeWidth   = context.getResources().getDimensionPixelSize(R.dimen.outline_width_active);
+        int defaultWidth  = context.getResources().getDimensionPixelSize(R.dimen.outline_width_regular);
+
+        container.removeAllViews();
+
+        for (PaletteColor colorOption : palette) {
+            int resolved = colorOption.resolveColor(context);
+
+            MaterialButton btn = new MaterialButton(
+                    new ContextThemeWrapper(context, R.style.Widget_DrawingApp_PaletteSwatch), null, 0);
+
+            LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(swatchSize, swatchSize);
+            lp.setMarginEnd(swatchSpacing);
+            btn.setLayoutParams(lp);
+            btn.setBackgroundTintList(ColorStateList.valueOf(resolved));
+            btn.setContentDescription(context.getString(
+                    R.string.select_color_description,
+                    context.getString(colorOption.getLabelResId())
+            ));
+
+            boolean isActive = resolved == activeColor;
+            btn.setStrokeColor(ColorStateList.valueOf(isActive ? activeStroke : defaultStroke));
+            btn.setStrokeWidth(isActive ? activeWidth : defaultWidth);
+            btn.setScaleX(isActive ? 1.05f : 1f);
+            btn.setScaleY(isActive ? 1.05f : 1f);
+
+            btn.setOnClickListener(v -> onColorPicked.onColorPicked(resolved));
+
+            container.addView(btn);
+        }
+    }
+
+    /**
+     * Met à jour visuellement les bordures de la palette pour refléter la nouvelle couleur active.
+     *
+     * @param container   palette à rafraîchir
+     * @param activeColor couleur désormais active
+     */
+    private void refreshSheetPalette(LinearLayout container, int activeColor) {
+        int activeStroke  = ContextCompat.getColor(context, R.color.brand_primary);
+        int defaultStroke = ContextCompat.getColor(context, R.color.stroke_soft);
+        int activeWidth   = context.getResources().getDimensionPixelSize(R.dimen.outline_width_active);
+        int defaultWidth  = context.getResources().getDimensionPixelSize(R.dimen.outline_width_regular);
+
+        for (int i = 0; i < container.getChildCount(); i++) {
+            if (!(container.getChildAt(i) instanceof MaterialButton)) continue;
+            MaterialButton btn = (MaterialButton) container.getChildAt(i);
+
+            // Retrouver la couleur du bouton via sa teinture de fond
+            int btnColor = btn.getBackgroundTintList() != null
+                    ? btn.getBackgroundTintList().getDefaultColor()
+                    : Color.TRANSPARENT;
+
+            boolean isActive = btnColor == activeColor;
+            btn.setStrokeColor(ColorStateList.valueOf(isActive ? activeStroke : defaultStroke));
+            btn.setStrokeWidth(isActive ? activeWidth : defaultWidth);
+            btn.setScaleX(isActive ? 1.05f : 1f);
+            btn.setScaleY(isActive ? 1.05f : 1f);
+        }
+    }
+
+    /** Interface fonctionnelle pour la sélection d'une couleur dans le BottomSheet. */
+    private interface ColorPickedCallback {
+        void onColorPicked(int color);
     }
 }

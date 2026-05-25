@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@color/surface_panel"
+    android:orientation="vertical"
+    android:paddingHorizontal="@dimen/padding_large"
+    android:paddingTop="@dimen/padding_medium"
+    android:paddingBottom="@dimen/padding_large">
+
+    <!-- Indicateur de glissement (Material Bottom Sheet handle) -->
+    <View
+        android:layout_width="40dp"
+        android:layout_height="4dp"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/margin_medium"
+        android:background="@color/stroke_soft" />
+
+    <!-- Titre -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:text="@string/sheet_title"
+        android:textColor="@color/ink_strong"
+        android:textSize="@dimen/text_title"
+        android:textStyle="bold" />
+
+    <!-- Section : Couleur du contour -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:text="@string/sheet_stroke_color_label"
+        android:textColor="@color/ink_soft"
+        android:textSize="@dimen/text_small"
+        android:textStyle="bold" />
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:scrollbars="none">
+
+        <LinearLayout
+            android:id="@+id/sheetPaletteStroke"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal" />
+    </HorizontalScrollView>
+
+    <!-- Section : Couleur du fond -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:text="@string/sheet_fill_color_label"
+        android:textColor="@color/ink_soft"
+        android:textSize="@dimen/text_small"
+        android:textStyle="bold" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sheetBtnNoFill"
+            style="@style/Widget.DrawingApp.InlineButton.Secondary"
+            android:layout_marginEnd="@dimen/margin_small"
+            android:text="@string/no_fill_action" />
+
+        <HorizontalScrollView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:scrollbars="none">
+
+            <LinearLayout
+                android:id="@+id/sheetPaletteFill"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" />
+        </HorizontalScrollView>
+    </LinearLayout>
+
+    <!-- Section : Épaisseur du trait -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_small"
+        android:gravity="center_vertical"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/sheet_stroke_width_label"
+            android:textColor="@color/ink_soft"
+            android:textSize="@dimen/text_small"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/sheetTvStrokeValue"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/brand_primary"
+            android:textSize="@dimen/text_medium"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/sheetSeekBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/margin_large"
+        android:max="24"
+        android:min="1"
+        android:progressTint="@color/brand_primary"
+        android:thumbTint="@color/brand_accent" />
+
+    <!-- Boutons d'action -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sheetBtnCancel"
+            style="@style/Widget.DrawingApp.ActionGridButton.Secondary"
+            android:text="@string/sheet_cancel" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/sheetBtnApply"
+            style="@style/Widget.DrawingApp.ActionGridButton.Primary"
+            android:text="@string/sheet_apply" />
+    </LinearLayout>
+
+</LinearLayout>
