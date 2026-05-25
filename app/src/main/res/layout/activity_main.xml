@@ -1,236 +1,454 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    Drawing Whiteboard - Écran Principal
-    Projet Android - Méthode Agile Sprint 3
-    Auteur: Équipe DrawingApp
-    Version: 3.0 - Outils séparés par catégorie
--->
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/background_light">
+    android:background="@drawable/bg_editor_screen"
+    android:orientation="vertical">
 
-    <!-- 📐 BARRE D'OUTILS DE FORMES -->
-    <!-- Ligne, Rectangle, Ellipse -->
-    <LinearLayout
-        android:id="@+id/shapesToolbar"
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/topAppBar"
+        style="@style/Widget.DrawingApp.Toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="@dimen/padding_small"
-        android:layout_marginTop="@dimen/margin_medium"
+        app:subtitle="@string/app_tagline"
+        app:title="@string/app_name" />
+
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.DrawingApp.HeroCard"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginHorizontal="@dimen/margin_medium"
-        android:background="@drawable/toolbar_background"
-        android:elevation="4dp">
+        android:layout_marginTop="@dimen/margin_tiny">
 
-        <Button
-            android:id="@+id/btnLine"
-            style="@style/Widget.DrawingApp.ToolButton"
-            android:text="@string/line_tool"
-            android:contentDescription="@string/draw_line_description" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="@dimen/padding_large">
 
-        <Button
-            android:id="@+id/btnRect"
-            style="@style/Widget.DrawingApp.ToolButton"
-            android:text="@string/rectangle_tool"
-            android:contentDescription="@string/draw_rectangle_description" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/hero_label"
+                android:textColor="@color/brand_secondary"
+                android:textSize="@dimen/text_small"
+                android:textStyle="bold" />
 
-        <Button
-            android:id="@+id/btnOval"
-            style="@style/Widget.DrawingApp.ToolButton"
-            android:text="@string/ellipse_tool"
-            android:contentDescription="@string/draw_ellipse_description" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_small"
+                android:text="@string/editor_headline"
+                android:textColor="@color/ink_strong"
+                android:textSize="@dimen/text_title"
+                android:textStyle="bold" />
 
-    </LinearLayout>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_tiny"
+                android:lineSpacingExtra="2dp"
+                android:text="@string/editor_subtitle"
+                android:textColor="@color/ink_soft"
+                android:textSize="@dimen/text_body" />
 
-    <!-- 🎨 BARRE DE SÉLECTION DE COULEURS -->
-    <!-- Palette de couleurs avec défilement horizontal -->
+            <com.google.android.material.chip.ChipGroup
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_medium"
+                app:singleLine="false">
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipCurrentMode"
+                    style="@style/Widget.DrawingApp.StatusChip"
+                    android:text="@string/draw_mode" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipCurrentShape"
+                    style="@style/Widget.DrawingApp.StatusChip"
+                    android:text="@string/rectangle_tool" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipCurrentStyle"
+                    style="@style/Widget.DrawingApp.StatusChip"
+                    android:text="@string/stroke_value_placeholder" />
+
+                <com.google.android.material.chip.Chip
+                    android:id="@+id/chipSelectionState"
+                    style="@style/Widget.DrawingApp.StatusChip"
+                    android:text="@string/selection_inactive" />
+            </com.google.android.material.chip.ChipGroup>
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
     <HorizontalScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="@dimen/margin_small"
-        android:layout_marginHorizontal="@dimen/margin_medium"
-        android:scrollbars="horizontal">
+        android:scrollbars="none">
 
         <LinearLayout
-            android:id="@+id/colorsToolbar"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:gravity="center"
-            android:padding="@dimen/padding_small"
-            android:background="@drawable/toolbar_background"
-            android:elevation="4dp">
+            android:paddingHorizontal="@dimen/margin_medium">
 
-            <!-- Boutons carrés de couleur sans texte -->
-            <Button
-                android:id="@+id/btnRed"
-                style="@style/Widget.DrawingApp.ColorSquare"
-                android:backgroundTint="@color/drawing_red"
-                android:contentDescription="@string/select_red_color" />
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.DrawingApp.SectionCard"
+                android:layout_width="@dimen/control_panel_width"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_small">
 
-            <Button
-                android:id="@+id/btnBlue"
-                style="@style/Widget.DrawingApp.ColorSquare"
-                android:backgroundTint="@color/drawing_blue"
-                android:contentDescription="@string/select_blue_color" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
 
-            <Button
-                android:id="@+id/btnGreen"
-                style="@style/Widget.DrawingApp.ColorSquare"
-                android:backgroundTint="@color/drawing_green"
-                android:contentDescription="@string/select_green_color" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/panel_shapes_title"
+                        android:textColor="@color/ink_strong"
+                        android:textSize="@dimen/text_medium"
+                        android:textStyle="bold" />
 
-            <Button
-                android:id="@+id/btnBlack"
-                style="@style/Widget.DrawingApp.ColorSquare"
-                android:backgroundTint="@color/drawing_black"
-                android:contentDescription="@string/select_black_color" />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_tiny"
+                        android:text="@string/panel_shapes_subtitle"
+                        android:textColor="@color/ink_soft"
+                        android:textSize="@dimen/text_small" />
 
-            <Button
-                android:id="@+id/btnYellow"
-                style="@style/Widget.DrawingApp.ColorSquare"
-                android:backgroundTint="@color/drawing_yellow"
-                android:contentDescription="@string/select_yellow_color" />
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/shapeToggleGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_medium"
+                        app:selectionRequired="true"
+                        app:singleSelection="true">
 
-            <Button
-                android:id="@+id/btnOrange"
-                style="@style/Widget.DrawingApp.ColorSquare"
-                android:backgroundTint="@color/drawing_orange"
-                android:contentDescription="@string/select_orange_color" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnLine"
+                            style="@style/Widget.DrawingApp.ToggleButton"
+                            android:contentDescription="@string/draw_line_description"
+                            android:text="@string/line_tool" />
 
-            <Button
-                android:id="@+id/btnPurple"
-                style="@style/Widget.DrawingApp.ColorSquare"
-                android:backgroundTint="@color/drawing_purple"
-                android:contentDescription="@string/select_purple_color" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnRect"
+                            style="@style/Widget.DrawingApp.ToggleButton"
+                            android:contentDescription="@string/draw_rectangle_description"
+                            android:text="@string/rectangle_tool" />
 
-            <Button
-                android:id="@+id/btnPink"
-                style="@style/Widget.DrawingApp.ColorSquare"
-                android:backgroundTint="@color/drawing_pink"
-                android:contentDescription="@string/select_pink_color" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnOval"
+                            style="@style/Widget.DrawingApp.ToggleButton"
+                            android:contentDescription="@string/draw_ellipse_description"
+                            android:text="@string/ellipse_tool" />
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
 
-            <Button
-                android:id="@+id/btnCyan"
-                style="@style/Widget.DrawingApp.ColorSquare"
-                android:backgroundTint="@color/drawing_cyan"
-                android:contentDescription="@string/select_cyan_color" />
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.DrawingApp.SectionCard"
+                android:layout_width="@dimen/control_panel_width"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/margin_small">
 
-            <Button
-                android:id="@+id/btnLime"
-                style="@style/Widget.DrawingApp.ColorSquare"
-                android:backgroundTint="@color/drawing_lime"
-                android:contentDescription="@string/select_lime_color" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
 
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/panel_modes_title"
+                        android:textColor="@color/ink_strong"
+                        android:textSize="@dimen/text_medium"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_tiny"
+                        android:text="@string/panel_modes_subtitle"
+                        android:textColor="@color/ink_soft"
+                        android:textSize="@dimen/text_small" />
+
+                    <com.google.android.material.button.MaterialButtonToggleGroup
+                        android:id="@+id/modeToggleGroup"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_medium"
+                        app:selectionRequired="true"
+                        app:singleSelection="true">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnDrawMode"
+                            style="@style/Widget.DrawingApp.ToggleButton"
+                            android:contentDescription="@string/draw_mode_description"
+                            android:text="@string/draw_mode" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnSelectMode"
+                            style="@style/Widget.DrawingApp.ToggleButton"
+                            android:contentDescription="@string/select_mode_description"
+                            android:text="@string/select_mode" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnEraseMode"
+                            style="@style/Widget.DrawingApp.ToggleButton"
+                            android:contentDescription="@string/erase_mode_description"
+                            android:text="@string/erase_mode" />
+                    </com.google.android.material.button.MaterialButtonToggleGroup>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                style="@style/Widget.DrawingApp.SectionCard"
+                android:layout_width="@dimen/control_panel_width"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="@dimen/padding_medium">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/panel_actions_title"
+                        android:textColor="@color/ink_strong"
+                        android:textSize="@dimen/text_medium"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_tiny"
+                        android:text="@string/panel_actions_subtitle"
+                        android:textColor="@color/ink_soft"
+                        android:textSize="@dimen/text_small" />
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="@dimen/margin_medium"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnUndo"
+                            style="@style/Widget.DrawingApp.ActionGridButton.Secondary"
+                            android:contentDescription="@string/undo_description"
+                            android:text="@string/undo_action" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnDelete"
+                            style="@style/Widget.DrawingApp.ActionGridButton.Destructive"
+                            android:contentDescription="@string/delete_description"
+                            android:text="@string/delete_action" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnClear"
+                            style="@style/Widget.DrawingApp.ActionGridButton.Secondary"
+                            android:contentDescription="@string/clear_description"
+                            android:text="@string/clear_action" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnShare"
+                            style="@style/Widget.DrawingApp.ActionGridButton.Primary"
+                            android:contentDescription="@string/share_description"
+                            android:text="@string/share_action" />
+                    </LinearLayout>
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
-
     </HorizontalScrollView>
 
-    <!-- ↩️ BARRE D'ACTIONS -->
-    <!-- Annuler et autres actions -->
-    <LinearLayout
-        android:id="@+id/actionsToolbar"
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.DrawingApp.SectionCard"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center"
-        android:padding="@dimen/padding_small"
-        android:layout_marginTop="@dimen/margin_small"
         android:layout_marginHorizontal="@dimen/margin_medium"
-        android:background="@drawable/toolbar_background"
-        android:elevation="4dp">
+        android:layout_marginTop="@dimen/margin_small">
 
-        <!-- Bouton Annuler -->
-        <Button
-            android:id="@+id/btnUndo"
-            style="@style/Widget.DrawingApp.ToolButton"
-            android:text="@string/undo_action"
-            android:contentDescription="@string/undo_description" />
-
-        <!-- Espace pour futures actions -->
-        <View
-            android:layout_width="0dp"
-            android:layout_height="1dp"
-            android:layout_weight="1" />
-
-        <!-- Bouton Effacer tout (pour plus tard) -->
-        <Button
-            android:id="@+id/btnClear"
-            style="@style/Widget.DrawingApp.ToolButton"
-            android:text="@string/clear_action"
-            android:backgroundTint="@color/drawing_red"
-            android:contentDescription="@string/clear_description"
-            android:visibility="gone" />
-
-    </LinearLayout>
-
-    <!-- ✏️ BARRE D'OPTIONS DE TRAIT -->
-    <!-- Épaisseur avec SeekBar pour ajustement précis -->
-    <LinearLayout
-        android:id="@+id/strokeToolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center"
-        android:padding="@dimen/padding_small"
-        android:layout_marginTop="@dimen/margin_small"
-        android:layout_marginHorizontal="@dimen/margin_medium"
-        android:background="@drawable/toolbar_background"
-        android:elevation="4dp">
-
-        <!-- Label et valeur -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center"
-            android:layout_marginBottom="@dimen/margin_tiny">
+            android:orientation="vertical"
+            android:padding="@dimen/padding_medium">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Épaisseur du trait : "
+                android:text="@string/panel_style_title"
+                android:textColor="@color/ink_strong"
                 android:textSize="@dimen/text_medium"
-                android:textColor="@color/black"
                 android:textStyle="bold" />
 
             <TextView
-                android:id="@+id/tvStrokeValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="8dp"
-                android:textSize="@dimen/text_medium"
-                android:textColor="@color/purple_primary"
-                android:textStyle="bold" />
+                android:layout_marginTop="@dimen/margin_tiny"
+                android:text="@string/panel_style_subtitle"
+                android:textColor="@color/ink_soft"
+                android:textSize="@dimen/text_small" />
 
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/margin_small"
+                    android:text="@string/color_target_label"
+                    android:textColor="@color/ink_strong"
+                    android:textSize="@dimen/text_small"
+                    android:textStyle="bold" />
+
+                <com.google.android.material.button.MaterialButtonToggleGroup
+                    android:id="@+id/targetToggleGroup"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:selectionRequired="true"
+                    app:singleSelection="true">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnStrokeTarget"
+                        style="@style/Widget.DrawingApp.ToggleButton"
+                        android:text="@string/stroke_target" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnFillTarget"
+                        style="@style/Widget.DrawingApp.ToggleButton"
+                        android:text="@string/fill_target" />
+                </com.google.android.material.button.MaterialButtonToggleGroup>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnNoFill"
+                    style="@style/Widget.DrawingApp.InlineButton.Secondary"
+                    android:layout_marginStart="@dimen/margin_small"
+                    android:text="@string/no_fill_action" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/stroke_label"
+                    android:textColor="@color/ink_strong"
+                    android:textSize="@dimen/text_small"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvStrokeValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="@dimen/margin_small"
+                    android:text="@string/stroke_value_placeholder"
+                    android:textColor="@color/brand_primary"
+                    android:textSize="@dimen/text_medium"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <SeekBar
+                android:id="@+id/seekBarStroke"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_small"
+                android:contentDescription="@string/stroke_seekbar_description"
+                android:max="24"
+                android:min="1"
+                android:progress="8"
+                android:progressTint="@color/brand_primary"
+                android:thumbTint="@color/brand_accent" />
+
+            <HorizontalScrollView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_small"
+                android:scrollbars="none">
+
+                <LinearLayout
+                    android:id="@+id/paletteContainer"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal" />
+            </HorizontalScrollView>
         </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
-        <!-- SeekBar pour ajuster l'épaisseur -->
-        <SeekBar
-            android:id="@+id/seekBarStroke"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:max="20"
-            android:progress="8"
-            android:progressTint="@color/purple_primary"
-            android:thumbTint="@color/purple_secondary"
-            android:contentDescription="Barre de défilement pour l'épaisseur du trait" />
+    <TextView
+        android:id="@+id/tvStatus"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/margin_medium"
+        android:layout_marginTop="@dimen/margin_small"
+        android:text="@string/status_draw_mode"
+        android:textColor="@color/ink_soft"
+        android:textSize="@dimen/text_small" />
 
-    </LinearLayout>
-
-    <!-- 🖼️ ZONE DE DESSIN -->
-    <!-- Espace principal pour créer les dessins -->
-    <mg.ramat.drawingapp.views.DrawingView
-        android:id="@+id/drawingView"
+    <com.google.android.material.card.MaterialCardView
+        style="@style/Widget.DrawingApp.CanvasCard"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="1"
         android:layout_margin="@dimen/margin_medium"
-        android:background="@color/canvas_background"
-        android:contentDescription="@string/drawing_canvas_description" />
+        android:layout_weight="1">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:padding="@dimen/padding_medium">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/canvas_panel_title"
+                android:textColor="@color/ink_strong"
+                android:textSize="@dimen/text_medium"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="@dimen/margin_tiny"
+                android:text="@string/canvas_panel_subtitle"
+                android:textColor="@color/ink_soft"
+                android:textSize="@dimen/text_small" />
+
+            <mg.ramat.drawingapp.views.DrawingView
+                android:id="@+id/drawingView"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginTop="@dimen/margin_medium"
+                android:layout_weight="1"
+                android:background="@color/canvas_background"
+                android:contentDescription="@string/drawing_canvas_description"
+                android:minHeight="@dimen/canvas_min_height" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
 
 </LinearLayout>
