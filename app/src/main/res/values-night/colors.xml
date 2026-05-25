@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="black">#FFF7FAFC</color>
+    <color name="white">#FF0E1319</color>
+
+    <color name="brand_primary">#8AB6DC</color>
+    <color name="brand_primary_container">#24415B</color>
+    <color name="brand_secondary">#6DC1BE</color>
+    <color name="brand_secondary_container">#1E4948</color>
+    <color name="brand_accent">#F0A18C</color>
+
+    <color name="screen_background">#0F151D</color>
+    <color name="surface_panel">#17212C</color>
+    <color name="surface_soft">#213041</color>
+    <color name="hero_card_background">#203445</color>
+    <color name="ink_strong">#F4F7FB</color>
+    <color name="ink_soft">#A9B5C5</color>
+    <color name="stroke_soft">#35506A</color>
+
+    <color name="drawing_red">#E08B74</color>
+    <color name="drawing_blue">#7EB1EA</color>
+    <color name="drawing_green">#71C7A9</color>
+    <color name="drawing_black">#F4F7FB</color>
+    <color name="drawing_yellow">#F5CA67</color>
+    <color name="drawing_orange">#F2A65A</color>
+    <color name="drawing_purple">#A69CF6</color>
+    <color name="drawing_pink">#F09ABE</color>
+    <color name="drawing_cyan">#7CCFDD</color>
+    <color name="drawing_lime">#B0D767</color>
+
+    <color name="purple_primary">@color/brand_primary</color>
+    <color name="purple_secondary">@color/brand_primary</color>
+    <color name="purple_light">@color/brand_primary_container</color>
+    <color name="purple_dark">#0B131A</color>
+
+    <color name="background_light">@color/screen_background</color>
+    <color name="canvas_background">#1C1B1F</color>
+    <color name="toolbar_background">@color/surface_panel</color>
+</resources>
