@@ -12,6 +12,9 @@ import androidx.core.content.FileProvider;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 import mg.ramat.drawingapp.databinding.ActivityMainBinding;
 import mg.ramat.drawingapp.editor.ui.EditorUiController;
@@ -39,6 +42,17 @@ public class MainActivity extends AppCompatActivity {
         editorUiController.detach();
     }
 
+    /**
+     * Exporte la toile en PNG puis lance le sélecteur de partage Android.
+     *
+     * Flux :
+     *  1. DrawingView.exportToBitmap() → rendu avec figures + tracés de gomme
+     *  2. Sauvegarde dans getCacheDir()/shared_images/drawing_<timestamp>.png
+     *  3. Uri via FileProvider (pas de permission WRITE_EXTERNAL_STORAGE nécessaire)
+     *  4. Intent ACTION_SEND → chooser natif Android
+     *
+     * Le nom de fichier inclut un timestamp pour ne pas écraser un export précédent.
+     */
     private void partagerDessin() {
         Bitmap bitmap = binding.drawingView.exportToBitmap();
 
@@ -53,7 +67,10 @@ public class MainActivity extends AppCompatActivity {
             return;
         }
 
-        File imageFile = new File(imagesFolder, "drawing_share.png");
+        // Nom horodaté pour ne pas écraser un partage précédent
+        String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault())
+                .format(new Date());
+        File imageFile = new File(imagesFolder, "drawing_" + timestamp + ".png");
 
         try (FileOutputStream outputStream = new FileOutputStream(imageFile)) {
             bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
