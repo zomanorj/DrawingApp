@@ -122,10 +122,10 @@
         android:layout_height="wrap_content"
         android:layout_marginBottom="@dimen/margin_large"
         app:labelBehavior="floating"
-        app:stepSize="1"
-        app:value="8"
-        app:valueFrom="1"
-        app:valueTo="50" />
+        android:stepSize="1"
+        android:value="8"
+        android:valueFrom="1"
+        android:valueTo="50" />
 
     <!-- Boutons d'action -->
     <LinearLayout

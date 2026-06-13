@@ -74,21 +74,29 @@
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipCurrentMode"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     style="@style/Widget.DrawingApp.StatusChip"
                     android:text="@string/draw_mode" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipCurrentShape"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     style="@style/Widget.DrawingApp.StatusChip"
                     android:text="@string/rectangle_tool" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipCurrentStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     style="@style/Widget.DrawingApp.StatusChip"
                     android:text="@string/stroke_value_placeholder" />
 
                 <com.google.android.material.chip.Chip
                     android:id="@+id/chipSelectionState"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
                     style="@style/Widget.DrawingApp.StatusChip"
                     android:text="@string/selection_inactive" />
             </com.google.android.material.chip.ChipGroup>
@@ -424,10 +432,10 @@
                 android:layout_marginTop="@dimen/margin_small"
                 android:contentDescription="@string/stroke_seekbar_description"
                 app:labelBehavior="floating"
-                app:stepSize="1"
-                app:value="8"
-                app:valueFrom="1"
-                app:valueTo="50" />
+                android:stepSize="1"
+                android:value="8"
+                android:valueFrom="1"
+                android:valueTo="50" />
 
             <!-- Palette de couleurs scrollable -->
             <HorizontalScrollView
